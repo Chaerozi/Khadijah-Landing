@@ -18,6 +18,8 @@ export default function Pembayaran() {
   const total = 200000;
   const [selectedMethod, setSelectedMethod] = useState(null);
   const [loading, setLoading] = useState(false);
+  console.log("STATE PEMBAYARAN:", state);
+
 
   const handlePayment = async () => {
     if (!window.snap) {
@@ -26,15 +28,15 @@ export default function Pembayaran() {
     }
 
     // =============================
-    // 🔑 PAYLOAD UTAMA
+    // 🔑 PAYLOAD UTAMA (FIXED)
     // =============================
     const payload = {
-      parent_name: state?.parentName,   // Mujiasri
-      email: state?.email,              // email ortu
-      phone: state?.whatsapp,           // WA
-      address: state?.address,          // alamat
-      child_name: state?.childName,     // Ardika Rahmad Septian
-      level: state?.level,              // Playgroup
+      parent_name: state?.parentName,
+      email: state?.email,
+      phone: state?.phone,          // ✅ FIX DI SINI
+      address: state?.address,
+      child_name: state?.childName,
+      level: state?.level,
       total,
     };
 
@@ -49,7 +51,7 @@ export default function Pembayaran() {
     try {
       setLoading(true);
 
-      // 1️⃣ MINTA TOKEN MIDTRANS
+      // 1️⃣ REQUEST TOKEN MIDTRANS
       const res = await fetch("http://localhost:5000/api/midtrans/token", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -65,9 +67,6 @@ export default function Pembayaran() {
 
       // 2️⃣ TAMPILKAN SNAP
       window.snap.pay(data.token, {
-        // =============================
-        // ✅ SUCCESS → KIRIM EMAIL
-        // =============================
         onSuccess: async () => {
           await fetch("http://localhost:5000/api/payment/success", {
             method: "POST",
@@ -77,7 +76,6 @@ export default function Pembayaran() {
 
           navigate("/pendaftaran/berhasil");
         },
-
         onPending: (r) => console.log("PENDING:", r),
         onError: (e) => console.error("ERROR:", e),
       });
@@ -167,9 +165,11 @@ export default function Pembayaran() {
 function StepperTop({ icon, label, status }) {
   return (
     <div className="flex flex-col items-center gap-1">
-      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-        status === "inactive" ? "bg-gray-200" : "bg-yellow-500"
-      }`}>
+      <div
+        className={`w-10 h-10 rounded-full flex items-center justify-center ${
+          status === "inactive" ? "bg-gray-200" : "bg-yellow-500"
+        }`}
+      >
         <img src={icon} alt={label} className="w-4 brightness-0 invert" />
       </div>
       <span className="text-[10px] font-semibold">{label}</span>
@@ -179,9 +179,11 @@ function StepperTop({ icon, label, status }) {
 
 function Divider({ active }) {
   return (
-    <div className={`flex-1 h-[2px] mx-1 ${
-      active ? "bg-yellow-400" : "bg-gray-300"
-    }`} />
+    <div
+      className={`flex-1 h-[2px] mx-1 ${
+        active ? "bg-yellow-400" : "bg-gray-300"
+      }`}
+    />
   );
 }
 

@@ -15,6 +15,7 @@ import Tanggal from "../assets/Pendaftarann/Lahir.svg";
 import Wali from "../assets/Pendaftarann/Kntal.svg";
 import KK from "../assets/Pendaftarann/file.svg";
 import EmailIcon from "../assets/Pendaftarann/email.svg"; // ⬅️ TAMBAH ICON EMAIL
+import { address } from "framer-motion/client";
 
 export default function Pendaftaran1() {
   const location = useLocation();
@@ -33,6 +34,8 @@ export default function Pendaftaran1() {
 
   const [errors, setErrors] = useState({});
   const [canSubmit, setCanSubmit] = useState(false);
+  const [kkPreview, setKkPreview] = useState(null);
+
 
   // ===== AUTO ISI DARI LANDING PAGE =====
   useEffect(() => {
@@ -51,7 +54,7 @@ export default function Pendaftaran1() {
     const { name, value, files } = e.target;
     let newErrors = { ...errors };
 
-    // Validasi WhatsApp
+    // ================= WhatsApp =================
     if (name === "whatsapp") {
       const regex = /^[0-9]{10,15}$/;
       if (!regex.test(value)) {
@@ -61,7 +64,7 @@ export default function Pendaftaran1() {
       }
     }
 
-    // Validasi Email
+    // ================= Email =================
     if (name === "email") {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(value)) {
@@ -71,18 +74,40 @@ export default function Pendaftaran1() {
       }
     }
 
-    // Validasi File KK (max 2MB)
+    // ================= FILE KK =================
     if (name === "kkFile" && files?.length) {
       const file = files[0];
-      const maxSize = 2 * 1024 * 1024;
+      const allowedTypes = [
+        "image/jpeg",
+        "image/png",
+        "application/pdf",
+      ];
+      const maxSize = 2 * 1024 * 1024; // 2MB
 
-      if (file.size > maxSize) {
-        newErrors.kkFile = "Ukuran file melebihi 2MB";
+      // ❌ format salah
+      if (!allowedTypes.includes(file.type)) {
+        newErrors.kkFile = "File harus JPG, PNG, atau PDF";
         setErrors(newErrors);
+        setFormData({ ...formData, kkFile: null });
+        setKkPreview(null);
         return;
-      } else {
-        delete newErrors.kkFile;
       }
+
+      // ❌ ukuran terlalu besar
+      if (file.size > maxSize) {
+        newErrors.kkFile = "Ukuran file maksimal 2MB";
+        setErrors(newErrors);
+        setFormData({ ...formData, kkFile: null });
+        setKkPreview(null);
+        return;
+      }
+
+      // ✅ valid → simpan preview
+      delete newErrors.kkFile;
+      setKkPreview({
+        url: URL.createObjectURL(file),
+        type: file.type,
+      });
     }
 
     setErrors(newErrors);
@@ -91,6 +116,7 @@ export default function Pendaftaran1() {
       [name]: files ? files[0] : value,
     });
   };
+
 
   // ===== VALIDASI FINAL =====
   useEffect(() => {
@@ -110,16 +136,55 @@ export default function Pendaftaran1() {
     setCanSubmit(valid);
   }, [formData, errors]);
 
+ 
   // ===== SUBMIT =====
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!canSubmit) return;
-    navigate("/pendaftaran/pembayaran", { state: formData });
+
+    try {
+      const payload = new FormData();
+
+      payload.append("parent_name", formData.parentName);
+      payload.append("email", formData.email);
+      payload.append("phone", formData.whatsapp);
+      payload.append("address", formData.address);
+      payload.append("child_name", formData.childName);
+      payload.append("level", formData.level);
+      payload.append("birth_date", formData.birthDate);
+      payload.append("kk_file", formData.kkFile);
+
+      const res = await fetch("http://localhost:5000/api/registration", {
+        method: "POST",
+        body: payload,
+      });
+
+      const result = await res.json();
+
+      if (!result.success) {
+        alert(result.message || "Pendaftaran gagal");
+        return;
+      }
+
+      navigate("/pendaftaran/pembayaran", {
+        state: {
+          parentName: formData.parentName,
+          email: formData.email,
+          phone: formData.whatsapp,
+          address: formData.address,
+          childName: formData.childName,
+          kk_url: result.kk_url,
+          level: formData.level,
+        },
+      });
+    } catch (err) {
+      console.error(err);
+      alert("Terjadi kesalahan saat mengirim data");
+    }
   };
 
   return (
-    <section className="min-h-screen bg-[#FFF9F1] pt-28 pb-20">
-      <div className="max-w-6xl mx-auto px-4">
-
+    <section className="min-h-screen bg-gradient-to-br from-orange-50 via-yellow-50 to-white py-12">
+      <div className="max-w-5xl mx-auto px-6">
         {/* HEADER */}
         <div className="text-center mb-14">
           <h1 className="text-4xl font-bold text-gray-900">
@@ -201,11 +266,30 @@ export default function Pendaftaran1() {
 
             <Upload
               icon={KK}
+              type="file"
               label="Upload Kartu Keluarga"
               name="kkFile"
+              accept=".jpg,.jpeg,.png,.pdf"
               onChange={handleChange}
               error={errors.kkFile}
             />
+
+            {/* 🔐 PREVIEW KK (HIDDEN - LOGIC ONLY) */}
+            {kkPreview && (
+              <div className="mt-3 border rounded-lg p-3 bg-gray-50">
+                {kkPreview.type === "application/pdf" ? (
+                  <div className="text-sm text-gray-600">
+                    📄 File PDF siap dikirim
+                  </div>
+                ) : (
+                  <img
+                    src={kkPreview.url}
+                    alt="Preview Kartu Keluarga"
+                    className="max-h-40 rounded-md border"
+                  />
+                )}
+              </div>
+            )}
 
             <div className="md:col-span-2">
               <Input
@@ -217,7 +301,7 @@ export default function Pendaftaran1() {
               />
             </div>
           </form>
-
+ 
           {/* BUTTON */}
           <div className="flex justify-end mt-14">
             <button
@@ -225,7 +309,7 @@ export default function Pendaftaran1() {
               onClick={handleSubmit}
               className={`px-10 py-3 rounded-xl font-semibold shadow-lg transition
               ${canSubmit
-                ? "bg-orange-500 hover:bg-orange-600 text-white"
+                ? "bg-yellow-500 hover:bg-yellow-600 text-white"
                 : "bg-gray-300 text-gray-500 cursor-not-allowed"}`}
             >
               Lanjut ke Pembayaran →
@@ -238,20 +322,32 @@ export default function Pendaftaran1() {
 }
 
 /* ===== COMPONENTS ===== */
-
 function Step({ icon, label, active }) {
   return (
     <div className="flex flex-col items-center text-sm">
-      <div className={`w-12 h-12 rounded-full flex items-center justify-center
-        ${active ? "bg-yellow-500" : "bg-gray-200"}`}>
-        <img src={icon} className={`w-6 ${active ? "invert" : "opacity-60"}`} />
+      <div
+        className={`w-12 h-12 rounded-full flex items-center justify-center ${
+          active ? "bg-yellow-500" : "bg-gray-200"
+        }`}
+      >
+        <img
+          src={icon}
+          alt={label}
+          className={`w-6 ${active ? "invert" : "opacity-60"}`}
+        />
       </div>
-      <span className={`mt-2 font-semibold ${active ? "text-yellow-600" : "text-gray-400"}`}>
+
+      <span
+        className={`mt-2 font-semibold ${
+          active ? "text-yellow-600" : "text-gray-400"
+        }`}
+      >
         {label}
       </span>
     </div>
   );
 }
+
 
 function Line() {
   return <div className="w-16 h-[2px] bg-orange-200" />;

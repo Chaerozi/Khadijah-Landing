@@ -45,17 +45,39 @@ export default function Hero() {
             </div>
 
             {/* CTA Buttons */}
-            <div className="mt-12 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <Link to="/pendaftaran" className="inline-block">
-                <button className="bg-yellow-500 hover:bg-yellow-600 active:scale-95 transition-all duration-150 text-white font-semibold px-8 py-3 rounded-lg shadow-md">
-                  Daftar Sekarang
-                </button>
-              </Link>
+            {/* CTA Buttons */}
+<div className="mt-12 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start w-full sm:w-auto">
+  <Link to="/pendaftaran" className="w-full sm:w-auto">
+    <button
+      className="
+        w-full sm:w-auto
+        bg-yellow-500 hover:bg-yellow-600 active:scale-95
+        transition-all duration-150
+        text-white font-semibold
+        px-8 py-4
+        rounded-xl shadow-md
+        text-base
+      "
+    >
+      Daftar Sekarang
+    </button>
+  </Link>
 
-              <button className="bg-white hover:bg-gray-50 text-gray-800 font-semibold px-8 py-3 rounded-lg border border-gray-300 transition">
-                Lihat Brosur
-              </button>
-            </div>
+  <button
+    className="
+      w-full sm:w-auto
+      bg-white hover:bg-gray-50 active:scale-95
+      transition-all duration-150
+      text-gray-800 font-semibold
+      px-8 py-4
+      rounded-xl
+      border-2 border-gray-300
+      text-base
+    "
+  >
+    Lihat Brosur
+  </button>
+</div>
 
             {/* Mini Stats */}
             <div className="mt-8 grid grid-cols-3 gap-8 max-w-md mx-auto lg:mx-0">
