@@ -187,7 +187,7 @@ export default function Pendaftaran1() {
       <div className="max-w-5xl mx-auto px-6">
         {/* HEADER */}
         <div className="text-center mb-14">
-          <h1 className="text-4xl font-bold text-gray-900">
+          <h1 className="text-4xl font-bold text-gray-900 mt-16">
             Formulir Pendaftaran Siswa Baru
           </h1>
           <p className="text-gray-600 mt-3">
