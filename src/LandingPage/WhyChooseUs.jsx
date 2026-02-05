@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 
 // Assets
 import Nilai from "../assets/Tentang/Masjid.svg";
-import Kurikulum from "../assets/Tentang/Tokum.svg";
+import Kurikulum from "../assets/Tentang/tokum.svg";
 import Aman from "../assets/Tentang/Defense.svg";
 
 export default function WhyChooseUs() {

@@ -52,7 +52,7 @@ export default function Pembayaran() {
       setLoading(true);
 
       // 1️⃣ REQUEST TOKEN MIDTRANS
-      const res = await fetch("http://localhost:5000/api/midtrans/token", {
+      const res = await fetch("https://khadijahbackendv2-production.up.railway.app/api/midtrans/token", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -68,7 +68,7 @@ export default function Pembayaran() {
       // 2️⃣ TAMPILKAN SNAP
       window.snap.pay(data.token, {
         onSuccess: async () => {
-          await fetch("http://localhost:5000/api/payment/success", {
+          await fetch("https://khadijahbackendv2-production.up.railway.app/api/payment/success", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload),
