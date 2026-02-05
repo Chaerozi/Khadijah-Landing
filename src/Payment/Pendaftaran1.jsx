@@ -153,7 +153,7 @@ export default function Pendaftaran1() {
       payload.append("birth_date", formData.birthDate);
       payload.append("kk_file", formData.kkFile);
 
-      const res = await fetch("http://localhost:5000/api/registration", {
+      const res = await fetch("https://khadijahbackendv2-production.up.railway.app/api/registration", {
         method: "POST",
         body: payload,
       });
