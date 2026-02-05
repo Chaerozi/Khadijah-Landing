@@ -13,7 +13,7 @@ import Nomor from "../assets/Pendaftarann/Hp.svg";
 import Alamat from "../assets/Pendaftarann/Loca.svg";
 import Tanggal from "../assets/Pendaftarann/Lahir.svg";
 import Wali from "../assets/Pendaftarann/Kntal.svg";
-import KK from "../assets/Pendaftarann/file.svg";
+import KK from "../assets/Pendaftarann/File.svg";
 import EmailIcon from "../assets/Pendaftarann/email.svg"; // ⬅️ TAMBAH ICON EMAIL
 import { address } from "framer-motion/client";
 
