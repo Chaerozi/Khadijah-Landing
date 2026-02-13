@@ -375,6 +375,8 @@ function Select({ icon, label, options, ...props }) {
   );
 }
 
+import { useRef } from "react";
+
 function Upload({
   icon,
   label,
@@ -385,14 +387,23 @@ function Upload({
   preview,
   setPreview,
   setFormData,
-  formData,
 }) {
+  const fileInputRef = useRef(null);
+
   const handleRemove = () => {
+    // reset preview
     setPreview(null);
+
+    // reset formData
     setFormData((prev) => ({
       ...prev,
       [name]: null,
     }));
+
+    // reset input file value
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   return (
@@ -403,18 +414,22 @@ function Upload({
 
       <div className="relative">
         <input
-          type="file"
-          name={name}
-          accept={accept}
-          onChange={onChange}
-          className="absolute inset-0 opacity-0 cursor-pointer"
-        />
+  ref={fileInputRef}
+  type="file"
+  name={name}
+  accept={accept}
+  onChange={onChange}
+  className={`absolute inset-0 opacity-0 ${
+    preview ? "pointer-events-none" : "cursor-pointer"
+  }`}
+/>
+
 
         <div
           className={`
             border-2 border-dashed rounded-xl p-6 text-center transition
-            ${error ? "border-red-400" : "border-yellow-300"}
-            bg-yellow-50 hover:bg-yellow-100
+            ${error ? "border-red-400" : "border-orange-300"}
+            bg-orange-50 hover:bg-orange-100
           `}
         >
           {!preview ? (
@@ -430,7 +445,9 @@ function Upload({
           ) : (
             <div className="space-y-3">
               {preview.type === "application/pdf" ? (
-                <p className="text-gray-700">📄 File PDF siap dikirim</p>
+                <p className="text-gray-700">
+                  📄 File PDF siap dikirim
+                </p>
               ) : (
                 <img
                   src={preview.url}
@@ -439,15 +456,13 @@ function Upload({
                 />
               )}
 
-              <div className="flex justify-center gap-4">
-                <button
-                  type="button"
-                  onClick={handleRemove}
-                  className="text-red-500 text-sm font-semibold hover:underline"
-                >
-                  Hapus
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={handleRemove}
+                className="text-red-500 text-sm font-semibold hover:underline"
+              >
+                Hapus
+              </button>
             </div>
           )}
         </div>
