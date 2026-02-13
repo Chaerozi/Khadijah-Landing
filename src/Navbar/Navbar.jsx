@@ -84,7 +84,7 @@ export default function Navbar() {
             {/* ===== MOBILE BUTTON ===== */}
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="md:hidden p-2 rounded-lg hover:bg-orange-50 transition"
+              className="md:hidden p-2 rounded-lg hover:bg-yellow-50 transition"
               aria-label="Toggle Menu"
             >
               {isOpen ? (
@@ -149,8 +149,8 @@ export default function Navbar() {
               onClick={() => setIsOpen(false)}
               className={`block px-6 py-4 font-medium transition
                 ${active
-                  ? "text-orange-500 bg-orange-50"
-                  : "text-gray-700 hover:bg-orange-50 hover:text-yel-500"}
+                  ? "text-yellow-500 bg-yellow-50"
+                  : "text-gray-700 hover:bg-yellow-50 hover:text-yel-500"}
               `}
             >
               {item.name}

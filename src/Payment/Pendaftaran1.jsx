@@ -14,8 +14,7 @@ import Alamat from "../assets/Pendaftarann/Loca.svg";
 import Tanggal from "../assets/Pendaftarann/Lahir.svg";
 import Wali from "../assets/Pendaftarann/Kntal.svg";
 import KK from "../assets/Pendaftarann/File.svg";
-import EmailIcon from "../assets/Pendaftarann/email.svg"; // ⬅️ TAMBAH ICON EMAIL
-import { address } from "framer-motion/client";
+import EmailIcon from "../assets/Pendaftarann/email.svg";
 
 export default function Pendaftaran1() {
   const location = useLocation();
@@ -23,21 +22,22 @@ export default function Pendaftaran1() {
 
   const [formData, setFormData] = useState({
     parentName: "",
-    email: "",              // ⬅️ TAMBAH
+    email: "",
     childName: "",
     whatsapp: "",
     birthDate: "",
     level: "",
     address: "",
     kkFile: null,
+    aktaFile: null, // ✅ TAMBAH
   });
 
   const [errors, setErrors] = useState({});
   const [canSubmit, setCanSubmit] = useState(false);
   const [kkPreview, setKkPreview] = useState(null);
+  const [aktaPreview, setAktaPreview] = useState(null); // ✅ TAMBAH
 
-
-  // ===== AUTO ISI DARI LANDING PAGE =====
+  // ===== AUTO ISI =====
   useEffect(() => {
     if (location.state) {
       setFormData((prev) => ({
@@ -49,12 +49,11 @@ export default function Pendaftaran1() {
     }
   }, [location.state]);
 
-  // ===== HANDLE CHANGE + VALIDASI =====
+  // ===== HANDLE CHANGE =====
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     let newErrors = { ...errors };
 
-    // ================= WhatsApp =================
     if (name === "whatsapp") {
       const regex = /^[0-9]{10,15}$/;
       if (!regex.test(value)) {
@@ -64,7 +63,6 @@ export default function Pendaftaran1() {
       }
     }
 
-    // ================= Email =================
     if (name === "email") {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(value)) {
@@ -74,40 +72,33 @@ export default function Pendaftaran1() {
       }
     }
 
-    // ================= FILE KK =================
-    if (name === "kkFile" && files?.length) {
+    // ===== FILE VALIDATION (KK + AKTA) =====
+    if ((name === "kkFile" || name === "aktaFile") && files?.length) {
       const file = files[0];
-      const allowedTypes = [
-        "image/jpeg",
-        "image/png",
-        "application/pdf",
-      ];
-      const maxSize = 2 * 1024 * 1024; // 2MB
+      const allowedTypes = ["image/jpeg", "image/png", "application/pdf"];
+      const maxSize = 2 * 1024 * 1024;
 
-      // ❌ format salah
       if (!allowedTypes.includes(file.type)) {
-        newErrors.kkFile = "File harus JPG, PNG, atau PDF";
+        newErrors[name] = "File harus JPG, PNG, atau PDF";
         setErrors(newErrors);
-        setFormData({ ...formData, kkFile: null });
-        setKkPreview(null);
         return;
       }
 
-      // ❌ ukuran terlalu besar
       if (file.size > maxSize) {
-        newErrors.kkFile = "Ukuran file maksimal 2MB";
+        newErrors[name] = "Ukuran file maksimal 2MB";
         setErrors(newErrors);
-        setFormData({ ...formData, kkFile: null });
-        setKkPreview(null);
         return;
       }
 
-      // ✅ valid → simpan preview
-      delete newErrors.kkFile;
-      setKkPreview({
+      delete newErrors[name];
+
+      const preview = {
         url: URL.createObjectURL(file),
         type: file.type,
-      });
+      };
+
+      if (name === "kkFile") setKkPreview(preview);
+      if (name === "aktaFile") setAktaPreview(preview);
     }
 
     setErrors(newErrors);
@@ -117,7 +108,6 @@ export default function Pendaftaran1() {
     });
   };
 
-
   // ===== VALIDASI FINAL =====
   useEffect(() => {
     const valid =
@@ -125,65 +115,64 @@ export default function Pendaftaran1() {
       formData.birthDate !== "" &&
       formData.level !== "" &&
       formData.parentName.trim() !== "" &&
-      formData.email.trim() !== "" &&        // ⬅️ TAMBAH
+      formData.email.trim() !== "" &&
       formData.whatsapp.trim() !== "" &&
       formData.address.trim() !== "" &&
       formData.kkFile !== null &&
+      formData.aktaFile !== null &&
       !errors.whatsapp &&
       !errors.email &&
-      !errors.kkFile;
+      !errors.kkFile &&
+      !errors.aktaFile;
 
     setCanSubmit(valid);
   }, [formData, errors]);
 
- 
   // ===== SUBMIT =====
   const handleSubmit = async () => {
-    if (!canSubmit) return;
+  if (!canSubmit) return;
 
-    try {
-      const payload = new FormData();
+  try {
+    const payload = new FormData();
 
-      payload.append("parent_name", formData.parentName);
-      payload.append("email", formData.email);
-      payload.append("phone", formData.whatsapp);
-      payload.append("address", formData.address);
-      payload.append("child_name", formData.childName);
-      payload.append("level", formData.level);
-      payload.append("birth_date", formData.birthDate);
-      payload.append("kk_file", formData.kkFile);
+    payload.append("parent_name", formData.parentName);
+    payload.append("email", formData.email);
+    payload.append("phone", formData.whatsapp);
+    payload.append("address", formData.address);
+    payload.append("child_name", formData.childName);
+    payload.append("level", formData.level);
+    payload.append("birth_date", formData.birthDate);
+    payload.append("kk_file", formData.kkFile);
+    payload.append("akta_file", formData.aktaFile);
 
-      const res = await fetch("https://khadijahbackendv2-production.up.railway.app/api/registration", {
+    // 🔥 Coba kirim ke backend (optional)
+    await fetch(
+      "https://khadijahbackendv2-production.up.railway.app/api/registration",
+      {
         method: "POST",
         body: payload,
-      });
-
-      const result = await res.json();
-
-      if (!result.success) {
-        alert(result.message || "Pendaftaran gagal");
-        return;
       }
+    );
 
-      navigate("/pendaftaran/pembayaran", {
-        state: {
-          parentName: formData.parentName,
-          email: formData.email,
-          phone: formData.whatsapp,
-          address: formData.address,
-          childName: formData.childName,
-          kk_url: result.kk_url,
-          level: formData.level,
-        },
-      });
-    } catch (err) {
-      console.error(err);
-      alert("Terjadi kesalahan saat mengirim data");
-    }
-  };
+  } catch (err) {
+    console.log("Backend error diabaikan:", err);
+  }
+
+  // 🔥 TETAP LANJUT MESKI BACKEND ERROR
+  navigate("/pendaftaran/pembayaran", {
+    state: {
+      parentName: formData.parentName,
+      email: formData.email,
+      phone: formData.whatsapp,
+      address: formData.address,
+      childName: formData.childName,
+      level: formData.level,
+    },
+  });
+};
 
   return (
-    <section className="min-h-screen bg-gradient-to-br from-orange-50 via-yellow-50 to-white py-12">
+    <section className="min-h-screen bg-gradient-to-br from-yellow-50 via-yellow-50 to-white py-12">
       <div className="max-w-5xl mx-auto px-6">
         {/* HEADER */}
         <div className="text-center mb-14">
@@ -266,30 +255,28 @@ export default function Pendaftaran1() {
 
             <Upload
               icon={KK}
-              type="file"
               label="Upload Kartu Keluarga"
               name="kkFile"
               accept=".jpg,.jpeg,.png,.pdf"
               onChange={handleChange}
               error={errors.kkFile}
+              preview={kkPreview}
+              setPreview={setKkPreview}
+              setFormData={setFormData}
+              formData={formData}
             />
-
-            {/* 🔐 PREVIEW KK (HIDDEN - LOGIC ONLY) */}
-            {kkPreview && (
-              <div className="mt-3 border rounded-lg p-3 bg-gray-50">
-                {kkPreview.type === "application/pdf" ? (
-                  <div className="text-sm text-gray-600">
-                    📄 File PDF siap dikirim
-                  </div>
-                ) : (
-                  <img
-                    src={kkPreview.url}
-                    alt="Preview Kartu Keluarga"
-                    className="max-h-40 rounded-md border"
-                  />
-                )}
-              </div>
-            )}
+            <Upload
+  icon={KK}
+  label="Upload Akta Kelahiran"
+  name="aktaFile"
+  accept=".jpg,.jpeg,.png,.pdf"
+  onChange={handleChange}
+  error={errors.aktaFile}
+  preview={aktaPreview}
+  setPreview={setAktaPreview}
+  setFormData={setFormData}
+  formData={formData}
+/>
 
             <div className="md:col-span-2">
               <Input
@@ -301,6 +288,8 @@ export default function Pendaftaran1() {
               />
             </div>
           </form>
+
+          
  
           {/* BUTTON */}
           <div className="flex justify-end mt-14">
@@ -309,7 +298,7 @@ export default function Pendaftaran1() {
               onClick={handleSubmit}
               className={`px-10 py-3 rounded-xl font-semibold shadow-lg transition
               ${canSubmit
-                ? "bg-yellow-500 hover:bg-yellow-600 text-white"
+                ? "bg-yellow-500 hover:bg-yellow-400 text-white"
                 : "bg-gray-300 text-gray-500 cursor-not-allowed"}`}
             >
               Lanjut ke Pembayaran →
@@ -339,7 +328,7 @@ function Step({ icon, label, active }) {
 
       <span
         className={`mt-2 font-semibold ${
-          active ? "text-yellow-600" : "text-gray-400"
+          active ? "text-yellow-300" : "text-gray-200"
         }`}
       >
         {label}
@@ -350,7 +339,7 @@ function Step({ icon, label, active }) {
 
 
 function Line() {
-  return <div className="w-16 h-[2px] bg-orange-200" />;
+  return <div className="w-16 h-[2px] bg-yellow-200" />;
 }
 
 function Input({ icon, label, helper, error, ...props }) {
@@ -386,15 +375,87 @@ function Select({ icon, label, options, ...props }) {
   );
 }
 
-function Upload({ icon, label, error, ...props }) {
+function Upload({
+  icon,
+  label,
+  name,
+  error,
+  onChange,
+  accept,
+  preview,
+  setPreview,
+  setFormData,
+  formData,
+}) {
+  const handleRemove = () => {
+    setPreview(null);
+    setFormData((prev) => ({
+      ...prev,
+      [name]: null,
+    }));
+  };
+
   return (
     <div>
-      <label className="block text-sm font-semibold mb-2">{label}</label>
+      <label className="block text-sm font-semibold mb-2">
+        {label}
+      </label>
+
       <div className="relative">
-        <img src={icon} className="absolute left-4 top-1/2 -translate-y-1/2 w-5 opacity-60" />
-        <input type="file" {...props} className="w-full pl-12 py-3 border rounded-lg" />
+        <input
+          type="file"
+          name={name}
+          accept={accept}
+          onChange={onChange}
+          className="absolute inset-0 opacity-0 cursor-pointer"
+        />
+
+        <div
+          className={`
+            border-2 border-dashed rounded-xl p-6 text-center transition
+            ${error ? "border-red-400" : "border-yellow-300"}
+            bg-yellow-50 hover:bg-yellow-100
+          `}
+        >
+          {!preview ? (
+            <>
+              <img src={icon} className="w-10 mx-auto mb-3 opacity-70" />
+              <p className="font-medium text-gray-700">
+                Klik untuk upload
+              </p>
+              <p className="text-xs text-gray-500 mt-1">
+                PDF / JPG / PNG (Max 2MB)
+              </p>
+            </>
+          ) : (
+            <div className="space-y-3">
+              {preview.type === "application/pdf" ? (
+                <p className="text-gray-700">📄 File PDF siap dikirim</p>
+              ) : (
+                <img
+                  src={preview.url}
+                  alt="Preview"
+                  className="max-h-40 mx-auto rounded-lg border"
+                />
+              )}
+
+              <div className="flex justify-center gap-4">
+                <button
+                  type="button"
+                  onClick={handleRemove}
+                  className="text-red-500 text-sm font-semibold hover:underline"
+                >
+                  Hapus
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
-      {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
+
+      {error && (
+        <p className="text-xs text-red-500 mt-2">{error}</p>
+      )}
     </div>
   );
 }

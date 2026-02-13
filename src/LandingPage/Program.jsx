@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
-import Playgroup from "../assets/Program/ProgramU.svg";
-import Kindergarten from "../assets/Program/ProgramUng.svg";
+import Playgroup from "../assets/Program/ProgramU.png";
+import Kindergarten from "../assets/Program/ProgramUn.png";
 import Pendidikan from "../assets/Pendaftarann/Toga.svg";
 
 export default function Program() {
@@ -11,12 +11,17 @@ export default function Program() {
 
   const sendWhatsApp = (program) => {
     const message = `
-Halo Admin Khadijah Islamic Preschool 👋
-Saya ingin berkonsultasi mengenai program:
+Assalamu’alaikum Warahmatullahi Wabarakatuh 😊
+
+Perkenalkan, saya ingin bertanya dan berkonsultasi mengenai program:
 📘 ${program}
 
-Terima kasih 🙏
-    `;
+Mohon informasi lebih lanjut.
+Terima kasih atas perhatian dan bantuannya.
+
+Wassalamu’alaikum Warahmatullahi Wabarakatuh
+`;
+
     window.open(
       `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`,
       "_blank"
@@ -39,7 +44,8 @@ Terima kasih 🙏
   const additionalPrograms = [
     "Reading & Writing",
     "Market Day",
-    "Parenting & Teaching Day",
+    "Parenting",
+    "Parent Teaching Day",
     "Outdoor Learning",
     "Practical Life Skill",
   ];
@@ -96,7 +102,6 @@ Terima kasih 🙏
             image={Playgroup}
             title="Playgroup"
             age="Usia 3–4 Tahun"
-            desc="Masa awal pembentukan karakter dan adab Islami melalui pendekatan bermain yang terarah."
             onClick={() => sendWhatsApp("Playgroup")}
           />
           <ProgramCard
@@ -104,7 +109,6 @@ Terima kasih 🙏
             image={Kindergarten}
             title="Kindergarten (TK A & B)"
             age="Usia 4–6 Tahun"
-            desc="Persiapan akademik dan spiritual menuju Sekolah Dasar dengan pendekatan Islami."
             onClick={() => sendWhatsApp("Kindergarten")}
           />
         </div>

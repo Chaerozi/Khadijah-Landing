@@ -19,7 +19,7 @@ export default function PaymentPage() {
           WhatsApp: <b>{state?.whatsapp}</b>
         </p>
 
-        <button className="w-full bg-orange-500 text-white py-3 rounded-lg font-semibold">
+        <button className="w-full bg-yellow-500 text-white py-3 rounded-lg font-semibold">
           Bayar Sekarang
         </button>
       </div>

@@ -1,12 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import HeroImage from "../assets/images/Beranda/Image1.svg";
+import HeroImage from "../assets/images/Beranda/Image1.png";
 
 export default function Hero() {
   return (
     <section
       id="beranda"
-      className="relative pt-44 pb-32 bg-gradient-to-b from-orange-50 to-white overflow-hidden"
+      className="relative pt-44 pb-32 bg-gradient-to-b from-yellow-50 to-white overflow-hidden"
     >
       {/* Background blur */}
       <div className="absolute -top-24 -right-24 w-96 h-96 bg-yellow-300/30 rounded-full blur-3xl" />
@@ -25,7 +25,7 @@ export default function Hero() {
             </h1>
 
             <p className="mt-8 text-gray-800 text-lg sm:text-xl leading-relaxed max-w-xl mx-auto lg:mx-0">
-              Sekolah pertama berbasis Islamic Montessori di kota Sorong.
+              Sekolah pertama berbasis Islamic Montessori di Kota Sorong.
               Membentuk karakter anak yang Sholeh, Cerdas, dan Mandiri melalui
               pendidikan berkualitas berbasis nilai-nilai Al-Qur'an dan Sunnah
               dalam lingkungan yang ceria.
@@ -45,39 +45,17 @@ export default function Hero() {
             </div>
 
             {/* CTA Buttons */}
-            {/* CTA Buttons */}
-<div className="mt-12 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start w-full sm:w-auto">
-  <Link to="/pendaftaran" className="w-full sm:w-auto">
-    <button
-      className="
-        w-full sm:w-auto
-        bg-yellow-500 hover:bg-yellow-600 active:scale-95
-        transition-all duration-150
-        text-white font-semibold
-        px-8 py-4
-        rounded-xl shadow-md
-        text-base
-      "
-    >
-      Daftar Sekarang
-    </button>
-  </Link>
+            <div className="mt-12 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+              <Link to="/pendaftaran" className="w-full sm:w-auto">
+                <button className="w-full sm:w-auto bg-yellow-500 hover:bg-yellow-600 active:scale-95 transition-all duration-150 text-white font-semibold px-8 py-4 rounded-xl shadow-md text-base">
+                  Daftar Sekarang
+                </button>
+              </Link>
 
-  <button
-    className="
-      w-full sm:w-auto
-      bg-white hover:bg-gray-50 active:scale-95
-      transition-all duration-150
-      text-gray-800 font-semibold
-      px-8 py-4
-      rounded-xl
-      border-2 border-gray-300
-      text-base
-    "
-  >
-    Lihat Brosur
-  </button>
-</div>
+              <button className="w-full sm:w-auto bg-white hover:bg-gray-50 active:scale-95 transition-all duration-150 text-gray-800 font-semibold px-8 py-4 rounded-xl border-2 border-gray-300 text-base">
+                Lihat Brosur
+              </button>
+            </div>
 
             {/* Mini Stats */}
             <div className="mt-8 grid grid-cols-3 gap-8 max-w-md mx-auto lg:mx-0">
@@ -98,15 +76,19 @@ export default function Hero() {
 
           {/* ================= IMAGE ================= */}
           <div className="w-full lg:w-1/2 flex justify-center">
-            <img
-              src={HeroImage}
-              alt="Ilustrasi Kegiatan Belajar Anak"
-              className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl drop-shadow-xl"
-            />
+            <div className="relative">
+              <div className="absolute inset-0 bg-yellow-200/30 blur-2xl rounded-3xl"></div>
+
+              <img
+                src={HeroImage}
+                alt="Ilustrasi Kegiatan Belajar Anak"
+                className="relative w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl object-cover rounded-3xl shadow-2xl"
+              />
+            </div>
           </div>
 
-        </div>
-      </div>
+        </div> {/* flex wrapper */}
+      </div> {/* container */}
     </section>
   );
 }
