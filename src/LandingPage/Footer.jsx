@@ -30,32 +30,40 @@ const YoutubeIcon = () => (
 
 export default function Footer() {
   return (
-    <footer id="kontak" className="bg-gradient-to-b from-[#1B1B1B] to-black text-gray-300">
+    <footer
+      id="kontak"
+      className="
+        bg-gradient-to-b
+        from-[#1B1B1B]
+        to-black
+        text-gray-300
+        pt-14 sm:pt-16 lg:pt-20
+      "
+    >
 
       {/* ================= MAIN FOOTER ================= */}
-      <div className="max-w-7xl mx-auto px-6 py-16">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-14">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-14">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-14">
 
           {/* ===== BRAND ===== */}
-          <div>
-            <div className="flex items-center gap-3 mb-4">
+          <div className="text-center sm:text-left">
+            <div className="flex items-center justify-center sm:justify-start gap-3 mb-4">
               <img
                 src={Logo}
                 alt="Khadijah Islamic Preschool"
                 className="w-12 h-12 rounded-full object-cover"
               />
-              <span className="text-white font-bold text-lg">
+              <span className="text-white font-bold text-base sm:text-lg">
                 Khadijah Islamic
               </span>
             </div>
 
-            <p className="text-sm text-gray-400 leading-relaxed mb-6">
-              Membentuk generasi islami yang sholeh, cerdas, dan mandiri melalui
-              pendidikan Islam modern berbasis karakter.
+            <p className="text-sm text-gray-400 leading-relaxed mb-6 max-w-sm mx-auto sm:mx-0">
+              Membentuk generasi islami yang sholeh, cerdas, dan mandiri
+              melalui pendidikan Islam modern berbasis karakter.
             </p>
 
-            {/* SOCIAL */}
-            <div className="flex gap-4">
+            <div className="flex justify-center sm:justify-start gap-4">
               <SocialLink
                 href="https://www.instagram.com/khadijahislamicpreschool/"
                 icon={<InstagramIcon />}
@@ -73,34 +81,23 @@ export default function Footer() {
 
           {/* ===== QUICK LINKS ===== */}
           <div>
-            <h4 className="text-white font-bold mb-5">Tautan Cepat</h4>
+            <h4 className="text-white font-bold mb-5 text-sm sm:text-base">
+              Tautan Cepat
+            </h4>
+
             <ul className="space-y-3 text-sm">
-              <li>
-                <a href="#beranda" className="hover:text-yellow-500 transition">
-                  Beranda
-                </a>
-              </li>
-              <li>
-                <a href="#tentang" className="hover:text-yellow-500 transition">
-                  Tentang Kami
-                </a>
-              </li>
-              <li>
-                <a href="#program" className="hover:text-yellow-500 transition">
-                  Program Pendidikan
-                </a>
-              </li>
-              <li>
-                <a href="#pendaftaran" className="hover:text-yellow-500 transition">
-                  Pendaftaran
-                </a>
-              </li>
+              <li><a href="#beranda" className="hover:text-yellow-500 transition">Beranda</a></li>
+              <li><a href="#tentang" className="hover:text-yellow-500 transition">Tentang Kami</a></li>
+              <li><a href="#program" className="hover:text-yellow-500 transition">Program Pendidikan</a></li>
+              <li><a href="#pendaftaran" className="hover:text-yellow-500 transition">Pendaftaran</a></li>
             </ul>
           </div>
 
           {/* ===== CONTACT ===== */}
           <div>
-            <h4 className="text-white font-bold mb-5">Hubungi Kami</h4>
+            <h4 className="text-white font-bold mb-5 text-sm sm:text-base">
+              Hubungi Kami
+            </h4>
 
             <ul className="space-y-4 text-sm">
               <li className="flex gap-3">
@@ -131,12 +128,15 @@ export default function Footer() {
 
           {/* ===== MAP ===== */}
           <div>
-            <h4 className="text-white font-bold mb-5">Lokasi Sekolah</h4>
+            <h4 className="text-white font-bold mb-5 text-sm sm:text-base">
+              Lokasi Sekolah
+            </h4>
+
             <div className="bg-white rounded-xl overflow-hidden shadow-lg">
               <iframe
                 title="Google Maps Khadijah Islamic Preschool"
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.332009981678!2d131.32886449999998!3d-0.8945863!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2d5955aedc3509f5%3A0xecb20c710c1e2bb8!2sBIMBEL%20KURSUS%20RUMAH%20SUKSES!5e0!3m2!1sen!2sid!4v1763122127944!5m2!1sen!2sid"
-                className="w-full h-[220px] border-0"
+                className="w-full h-[180px] sm:h-[220px] border-0"
                 loading="lazy"
               ></iframe>
             </div>
@@ -147,14 +147,29 @@ export default function Footer() {
 
       {/* ================= BOTTOM ================= */}
       <div className="border-t border-gray-800">
-        <div className="max-w-7xl mx-auto px-6 py-6 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500 gap-4">
+        <div className="
+          max-w-7xl mx-auto
+          px-4 sm:px-6
+          py-5
+          flex flex-col md:flex-row
+          justify-between items-center
+          text-xs sm:text-sm
+          text-gray-500
+          gap-4
+        ">
           <p>© 2024 Khadijah Islamic Preschool. Seluruh hak cipta dilindungi.</p>
+
           <div className="flex gap-6">
-            <a className="hover:text-yellow-500">Syarat & Ketentuan</a>
-            <a className="hover:text-yellow-500">Kebijakan Privasi</a>
+            <a className="hover:text-yellow-500 cursor-pointer">
+              Syarat & Ketentuan
+            </a>
+            <a className="hover:text-yellow-500 cursor-pointer">
+              Kebijakan Privasi
+            </a>
           </div>
         </div>
       </div>
+
     </footer>
   );
 }
@@ -166,7 +181,14 @@ const SocialLink = ({ href, icon }) => (
     href={href}
     target="_blank"
     rel="noopener noreferrer"
-    className="w-10 h-10 bg-gray-800 hover:bg-yellow-500 rounded-full flex items-center justify-center transition text-white"
+    className="
+      w-9 h-9 sm:w-10 sm:h-10
+      bg-gray-800
+      hover:bg-yellow-500
+      rounded-full
+      flex items-center justify-center
+      transition text-white
+    "
   >
     {icon}
   </a>

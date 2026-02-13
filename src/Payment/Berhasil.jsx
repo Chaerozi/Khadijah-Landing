@@ -9,7 +9,7 @@ import SelesaiStep from "../assets/Pendaftarann/Selesai.svg";
 export default function Berhasil() {
   const navigate = useNavigate();
 
-  // ⏱️ Auto redirect ke Beranda
+  // ⏱ Auto redirect
   useEffect(() => {
     const timer = setTimeout(() => {
       navigate("/");
@@ -18,10 +18,10 @@ export default function Berhasil() {
   }, [navigate]);
 
   return (
-    <section className="min-h-screen bg-gradient-to-br from-[#FFF6E8] via-[#FFF9F1] to-[#FFFDF8] px-4">
+    <section className="min-h-screen bg-gradient-to-b from-yellow-50 via-white to-yellow-50 px-4">
 
-      {/* ===== STEPPER (ATAS) ===== */}
-      <div className="pt-16 pb-10">
+      {/* ===== STEPPER ===== */}
+      <div className="pt-14 pb-8">
         <div className="max-w-md mx-auto flex items-center justify-between">
           <StepperTop icon={IsiDataStep} label="Isi Data" status="done" />
           <Divider active />
@@ -31,21 +31,23 @@ export default function Berhasil() {
         </div>
       </div>
 
-      {/* ===== CARD SUCCESS ===== */}
-      <div className="flex justify-center pb-24">
+      {/* ===== SUCCESS CARD ===== */}
+      <div className="flex justify-center pb-20">
         <div
           className="
-            w-full max-w-md bg-white
-            rounded-[28px]
-            shadow-[0_25px_70px_rgba(0,0,0,0.10)]
-            px-7 py-9 text-center
+            w-full max-w-md
+            bg-white
+            rounded-3xl
+            shadow-2xl
+            px-8 py-10
+            text-center
             animate-fadeIn
           "
         >
-          {/* SUCCESS ICON */}
+          {/* ICON */}
           <div className="flex justify-center mb-6">
             <div className="relative">
-              <div className="w-24 h-24 rounded-full bg-yellow-100 flex items-center justify-center">
+              <div className="w-24 h-24 rounded-full bg-yellow-100 flex items-center justify-center animate-pulse">
                 <svg
                   className="w-12 h-12 text-yellow-600"
                   fill="none"
@@ -61,57 +63,74 @@ export default function Berhasil() {
                   <circle cx="12" cy="12" r="9" />
                 </svg>
               </div>
-              <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-yellow-500 text-white text-[11px] px-3 py-1 rounded-full shadow">
+
+              <span className="
+                absolute -bottom-2 left-1/2 -translate-x-1/2
+                bg-yellow-500 text-white text-[11px]
+                px-3 py-1 rounded-full shadow
+              ">
                 Berhasil
               </span>
             </div>
           </div>
 
           {/* TITLE */}
-          <h1 className="text-[22px] sm:text-2xl font-bold text-gray-900 mb-2">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3">
             Pendaftaran Berhasil 🎉
           </h1>
 
           <p className="text-gray-600 text-sm leading-relaxed mb-6">
             Terima kasih telah mempercayakan pendidikan Ananda kepada
             <span className="font-semibold text-gray-800">
-              {" "}
-              Khadijah Islamic Preschool
-            </span>
-            .
+              {" "}Khadijah Islamic Preschool
+            </span>.
             <br />
-            <span className="text-gray-500">
-              Data pendaftaran & pembayaran telah kami terima.
-            </span>
+            Data pendaftaran & pembayaran telah kami terima.
           </p>
 
           {/* INFO BOX */}
-          <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-4 text-left text-sm text-gray-700 mb-6 space-y-3">
+          <div className="
+            bg-yellow-50
+            border border-yellow-200
+            rounded-2xl
+            p-4
+            text-left
+            text-sm
+            text-gray-700
+            mb-6
+            space-y-3
+          ">
             <div className="flex gap-3 items-start">
-              <span className="text-lg">📞</span>
+              <span>📞</span>
               <span>
-                Tim admin akan menghubungi Anda melalui
+                Admin akan menghubungi Anda melalui
                 <b className="text-gray-800"> WhatsApp</b>.
               </span>
             </div>
+
             <div className="flex gap-3 items-start">
-              <span className="text-lg">⏳</span>
+              <span>⏳</span>
               <span>
-                Estimasi konfirmasi maksimal{" "}
-                <b className="text-gray-800">1×24 jam kerja</b>.
+                Estimasi konfirmasi maksimal
+                <b className="text-gray-800"> 1×24 jam kerja</b>.
               </span>
             </div>
           </div>
 
-          {/* ACTION BUTTONS */}
+          {/* BUTTONS */}
           <div className="flex flex-col gap-3">
             <button
               onClick={() => navigate("/")}
               className="
-                w-full bg-yellow-500 hover:bg-yellow-600
-                text-white py-3 rounded-xl
-                font-semibold transition
-                shadow-md active:scale-[0.98]
+                w-full
+                bg-yellow-500 hover:bg-yellow-600
+                text-white
+                py-3
+                rounded-xl
+                font-semibold
+                shadow-md
+                transition
+                active:scale-[0.98]
               "
             >
               Kembali ke Beranda
@@ -122,10 +141,15 @@ export default function Berhasil() {
               target="_blank"
               rel="noopener noreferrer"
               className="
-                w-full border border-yellow-400
-                text-yellow-600 hover:bg-yellow-50
-                py-3 rounded-xl font-semibold
-                transition text-center
+                w-full
+                border border-yellow-400
+                text-yellow-600
+                hover:bg-yellow-50
+                py-3
+                rounded-xl
+                font-semibold
+                transition
+                text-center
                 active:scale-[0.98]
               "
             >
@@ -133,7 +157,7 @@ export default function Berhasil() {
             </a>
           </div>
 
-          {/* FOOT NOTE */}
+          {/* FOOTNOTE */}
           <p className="text-[11px] text-gray-400 mt-6">
             Anda akan diarahkan otomatis ke beranda dalam beberapa detik.
           </p>
@@ -143,11 +167,11 @@ export default function Berhasil() {
   );
 }
 
-/* ================= STEPPER COMPONENTS ================= */
+/* ===== COMPONENTS ===== */
 
 function StepperTop({ icon, label, status }) {
   return (
-    <div className="flex flex-col items-center gap-1">
+    <div className="flex flex-col items-center gap-1 text-[10px]">
       <div
         className={`w-10 h-10 rounded-full flex items-center justify-center ${
           status === "active"
@@ -159,7 +183,7 @@ function StepperTop({ icon, label, status }) {
       >
         <img src={icon} alt={label} className="w-4 brightness-0 invert" />
       </div>
-      <span className="text-[10px] font-semibold text-gray-700">
+      <span className="font-semibold text-gray-600">
         {label}
       </span>
     </div>

@@ -20,7 +20,6 @@ export default function Registration() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    //  KIRIM DATA KE FORMULIR PENDAFTARAN SISWA
     navigate("/pendaftaran", {
       state: {
         parentName: formData.parentName,
@@ -31,50 +30,85 @@ export default function Registration() {
   };
 
   return (
-    <section id="pendaftaran" className="py-28 bg-white">
-      <div className="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-20 items-center">
+    <section
+      id="pendaftaran"
+      className="
+        py-16 sm:py-20 lg:py-28
+        bg-white
+      "
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
 
         {/* ================= LEFT CONTENT ================= */}
-        <div>
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight mb-6">
-            Pendaftaran Online <br />
+        <div className="text-center lg:text-left">
+
+          <h2 className="
+            text-2xl sm:text-3xl lg:text-4xl xl:text-5xl
+            font-bold text-gray-900
+            leading-tight mb-5
+          ">
+            Pendaftaran Online
+            <br />
             Mudah & Cepat
           </h2>
 
-          <p className="text-gray-600 text-lg mb-10 max-w-xl leading-relaxed">
-            Orang tua dapat melakukan pendaftaran dan pembayaran biaya pendidikan
-            secara online melalui sistem yang aman, cepat, dan terintegrasi.
+          <p className="
+            text-gray-600
+            text-sm sm:text-base lg:text-lg
+            mb-8
+            max-w-lg
+            mx-auto lg:mx-0
+            leading-relaxed
+          ">
+            Orang tua dapat melakukan pendaftaran dan pembayaran
+            biaya pendidikan secara online melalui sistem yang
+            aman, cepat, dan terintegrasi.
           </p>
 
           {/* Steps */}
-          <div className="space-y-6">
+          <div className="space-y-5 max-w-md mx-auto lg:mx-0">
             {[
               "Isi formulir pendaftaran digital",
               "Bayar biaya registrasi via Midtrans",
               "Konfirmasi otomatis & verifikasi data",
             ].map((text, i) => (
-              <div key={i} className="flex items-start gap-4">
-                <div className="w-9 h-9 rounded-full bg-yellow-500 text-white flex items-center justify-center font-bold">
+              <div key={i} className="flex items-start gap-4 text-left">
+                <div className="
+                  w-8 h-8
+                  rounded-full
+                  bg-yellow-500
+                  text-white
+                  flex items-center justify-center
+                  font-semibold text-sm
+                  shrink-0
+                ">
                   {i + 1}
                 </div>
-                <p className="text-gray-700 text-base">{text}</p>
+                <p className="text-gray-700 text-sm sm:text-base">
+                  {text}
+                </p>
               </div>
             ))}
           </div>
         </div>
 
         {/* ================= RIGHT FORM ================= */}
-        <div className="bg-[#FFF7ED] rounded-3xl shadow-xl p-8 md:p-10">
+        <div className="
+          bg-[#FFF7ED]
+          rounded-3xl
+          shadow-xl
+          p-6 sm:p-8 md:p-10
+        ">
 
           {/* Header */}
-          <div className="flex items-center gap-3 mb-8">
-            <span className="text-2xl">📋</span>
-            <h3 className="text-xl font-bold text-gray-900">
+          <div className="flex items-center gap-3 mb-6">
+            <span className="text-xl">📋</span>
+            <h3 className="text-lg sm:text-xl font-bold text-gray-900">
               Mulai Pendaftaran
             </h3>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-5">
 
             <Input
               label="Nama Lengkap Orang Tua"
@@ -102,18 +136,28 @@ export default function Registration() {
 
             <button
               type="submit"
-              className="w-full mt-2 bg-yellow-500 hover:bg-yellow-600
-                         active:scale-[0.98] transition-all
-                         text-white font-semibold py-3 rounded-xl shadow-md"
+              className="
+                w-full
+                bg-yellow-500 hover:bg-yellow-600
+                active:scale-[0.98]
+                transition-all
+                text-white
+                font-semibold
+                py-3
+                rounded-xl
+                shadow-md
+                text-sm sm:text-base
+              "
             >
               Daftar & Lanjut Pembayaran
             </button>
 
-            <p className="text-xs text-center text-gray-500 mt-4">
+            <p className="text-xs text-center text-gray-500 mt-3">
               Dengan mendaftar, Anda menyetujui kebijakan privasi kami
             </p>
           </form>
         </div>
+
       </div>
     </section>
   );
@@ -124,14 +168,29 @@ export default function Registration() {
 function Input({ label, ...props }) {
   return (
     <div>
-      <label className="block text-sm font-semibold text-gray-700 mb-2">
+      <label className="
+        block
+        text-xs sm:text-sm
+        font-semibold
+        text-gray-700
+        mb-2
+      ">
         {label}
       </label>
+
       <input
         {...props}
         required
-        className="w-full px-4 py-3 rounded-lg border border-gray-300
-                   focus:ring-2 focus:ring-yellow-400 outline-none bg-white"
+        className="
+          w-full
+          px-4 py-3
+          rounded-lg
+          border border-gray-300
+          focus:ring-2 focus:ring-yellow-400
+          outline-none
+          bg-white
+          text-sm sm:text-base
+        "
       />
     </div>
   );

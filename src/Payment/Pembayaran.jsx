@@ -18,8 +18,6 @@ export default function Pembayaran() {
   const total = 200000;
   const [selectedMethod, setSelectedMethod] = useState(null);
   const [loading, setLoading] = useState(false);
-  console.log("STATE PEMBAYARAN:", state);
-
 
   const handlePayment = async () => {
     if (!window.snap) {
@@ -27,20 +25,16 @@ export default function Pembayaran() {
       return;
     }
 
-    // =============================
-    // 🔑 PAYLOAD UTAMA (FIXED)
-    // =============================
     const payload = {
       parent_name: state?.parentName,
       email: state?.email,
-      phone: state?.phone,          // ✅ FIX DI SINI
+      phone: state?.whatsapp,
       address: state?.address,
       child_name: state?.childName,
       level: state?.level,
       total,
     };
 
-    // ❌ VALIDASI
     for (const key in payload) {
       if (!payload[key]) {
         alert(`Data ${key} kosong`);
@@ -51,12 +45,14 @@ export default function Pembayaran() {
     try {
       setLoading(true);
 
-      // 1️⃣ REQUEST TOKEN MIDTRANS
-      const res = await fetch("https://khadijahbackendv2-production.up.railway.app/api/midtrans/token", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      const res = await fetch(
+        "https://khadijahbackendv2-production.up.railway.app/api/midtrans/token",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }
+      );
 
       const data = await res.json();
 
@@ -65,14 +61,16 @@ export default function Pembayaran() {
         return;
       }
 
-      // 2️⃣ TAMPILKAN SNAP
       window.snap.pay(data.token, {
         onSuccess: async () => {
-          await fetch("https://khadijahbackendv2-production.up.railway.app/api/payment/success", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-          });
+          await fetch(
+            "https://khadijahbackendv2-production.up.railway.app/api/payment/success",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            }
+          );
 
           navigate("/pendaftaran/berhasil");
         },
@@ -88,10 +86,11 @@ export default function Pembayaran() {
   };
 
   return (
-    <section className="min-h-screen bg-[#FFF9F1] px-4">
+    <section className="min-h-screen bg-gradient-to-b from-yellow-50 to-white px-4 py-10">
+
       {/* ===== STEPPER ===== */}
-      <div className="pt-16 pb-10">
-        <div className="max-w-md mx-auto flex items-center justify-between">
+      <div className="mt-28 max-w-md mx-auto mb-10">
+        <div className="flex items-center justify-between">
           <StepperTop icon={IsiDataStep} label="Isi Data" status="done" />
           <Divider active />
           <StepperTop icon={PembayaranStep} label="Pembayaran" status="active" />
@@ -101,22 +100,40 @@ export default function Pembayaran() {
       </div>
 
       {/* ===== CARD ===== */}
-      <div className="flex justify-center pb-24">
-        <div className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden">
-          <div className="bg-yellow-500 px-5 py-4 text-white flex justify-between">
-            <div>
-              <h3 className="font-semibold text-sm">Pilih Pembayaran</h3>
-              <p className="text-xs opacity-90">Khadijah Islamic Preschool</p>
-            </div>
-            <div className="text-right">
-              <p className="text-xs">Total</p>
-              <p className="font-bold">
-                Rp {total.toLocaleString("id-ID")}
-              </p>
+      <div className="flex justify-center">
+        <div className="w-full max-w-md bg-white rounded-3xl shadow-xl overflow-hidden">
+
+          {/* HEADER */}
+          <div className="bg-yellow-500 px-6 py-5 text-white">
+            <div className="flex justify-between items-start">
+              <div>
+                <h3 className="font-semibold text-sm">
+                  Konfirmasi Pembayaran
+                </h3>
+                <p className="text-xs opacity-90">
+                  Khadijah Islamic Preschool
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="text-xs">Total</p>
+                <p className="font-bold text-lg">
+                  Rp {total.toLocaleString("id-ID")}
+                </p>
+              </div>
             </div>
           </div>
 
-          <div className="p-5">
+          {/* BODY */}
+          <div className="p-6">
+
+            {/* DATA SUMMARY */}
+            <div className="bg-yellow-50 rounded-xl p-4 mb-6 text-xs space-y-2">
+              <DataRow label="Orang Tua" value={state?.parentName} />
+              <DataRow label="Ananda" value={state?.childName} />
+              <DataRow label="Jenjang" value={state?.level} />
+            </div>
+
+            {/* PAYMENT METHODS */}
             <div className="space-y-3">
               <Method
                 icon={QrisIcon}
@@ -125,6 +142,7 @@ export default function Pembayaran() {
                 active={selectedMethod === "qris"}
                 onClick={() => setSelectedMethod("qris")}
               />
+
               <Method
                 icon={VirtualIcon}
                 title="Virtual Account"
@@ -132,6 +150,7 @@ export default function Pembayaran() {
                 active={selectedMethod === "va"}
                 onClick={() => setSelectedMethod("va")}
               />
+
               <Method
                 icon={KreditIcon}
                 title="Kartu Kredit"
@@ -141,10 +160,11 @@ export default function Pembayaran() {
               />
             </div>
 
+            {/* BUTTON */}
             <button
               disabled={!selectedMethod || loading}
               onClick={handlePayment}
-              className={`mt-6 w-full py-4 rounded-xl font-semibold text-sm
+              className={`mt-6 w-full py-4 rounded-xl font-semibold text-sm transition
                 ${
                   selectedMethod
                     ? "bg-yellow-500 hover:bg-yellow-600 text-white"
@@ -153,6 +173,10 @@ export default function Pembayaran() {
             >
               {loading ? "Memproses..." : "Bayar Sekarang"}
             </button>
+
+            <p className="text-center text-xs text-gray-400 mt-4">
+              Pembayaran aman & terenkripsi oleh Midtrans
+            </p>
           </div>
         </div>
       </div>
@@ -164,7 +188,7 @@ export default function Pembayaran() {
 
 function StepperTop({ icon, label, status }) {
   return (
-    <div className="flex flex-col items-center gap-1">
+    <div className="flex flex-col items-center gap-1 text-[10px]">
       <div
         className={`w-10 h-10 rounded-full flex items-center justify-center ${
           status === "inactive" ? "bg-gray-200" : "bg-yellow-500"
@@ -172,7 +196,17 @@ function StepperTop({ icon, label, status }) {
       >
         <img src={icon} alt={label} className="w-4 brightness-0 invert" />
       </div>
-      <span className="text-[10px] font-semibold">{label}</span>
+      <span
+        className={`font-semibold ${
+          status === "active"
+            ? "text-yellow-600"
+            : status === "done"
+            ? "text-gray-600"
+            : "text-gray-400"
+        }`}
+      >
+        {label}
+      </span>
     </div>
   );
 }
@@ -191,8 +225,12 @@ function Method({ icon, title, desc, active, onClick }) {
   return (
     <div
       onClick={onClick}
-      className={`flex items-center gap-3 border rounded-xl px-4 py-3 cursor-pointer
-        ${active ? "border-yellow-500 bg-yellow-50" : "hover:bg-gray-50"}`}
+      className={`flex items-center gap-3 border rounded-xl px-4 py-3 cursor-pointer transition
+        ${
+          active
+            ? "border-yellow-500 bg-yellow-50"
+            : "border-gray-200 hover:bg-gray-50"
+        }`}
     >
       <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
         <img src={icon} alt={title} className="w-5" />
@@ -202,6 +240,15 @@ function Method({ icon, title, desc, active, onClick }) {
         <p className="text-xs text-gray-500">{desc}</p>
       </div>
       {active && <span className="text-yellow-500 font-bold">✓</span>}
+    </div>
+  );
+}
+
+function DataRow({ label, value }) {
+  return (
+    <div className="flex justify-between">
+      <span className="text-gray-600">{label}</span>
+      <span className="font-semibold text-gray-800">{value}</span>
     </div>
   );
 }
