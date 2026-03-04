@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useRegistrationStore } from "../store/registrationStore";
 
 // ===== STEPPER ICONS =====
 import IsiDataStep from "../assets/Pendaftarann/isidata.svg";
@@ -8,18 +9,20 @@ import SelesaiStep from "../assets/Pendaftarann/Selesai.svg";
 
 export default function Berhasil() {
   const navigate = useNavigate();
+  const { clearRegistration } = useRegistrationStore();
 
-  // ⏱️ Auto redirect ke Beranda
+  // ⏱️ Auto redirect ke Beranda + Clear Zustand
   useEffect(() => {
     const timer = setTimeout(() => {
+      clearRegistration(); // Clear registration data dari localStorage
       navigate("/");
     }, 12000);
+
     return () => clearTimeout(timer);
-  }, [navigate]);
+  }, [navigate, clearRegistration]);
 
   return (
     <section className="min-h-screen bg-gradient-to-br from-[#FFF6E8] via-[#FFF9F1] to-[#FFFDF8] px-4">
-
       {/* ===== STEPPER (ATAS) ===== */}
       <div className="pt-16 pb-10">
         <div className="max-w-md mx-auto flex items-center justify-between">
@@ -106,7 +109,10 @@ export default function Berhasil() {
           {/* ACTION BUTTONS */}
           <div className="flex flex-col gap-3">
             <button
-              onClick={() => navigate("/")}
+              onClick={() => {
+                clearRegistration(); // Clear state sebelum navigate
+                navigate("/");
+              }}
               className="
                 w-full bg-yellow-500 hover:bg-yellow-600
                 text-white py-3 rounded-xl
@@ -153,15 +159,13 @@ function StepperTop({ icon, label, status }) {
           status === "active"
             ? "bg-yellow-500"
             : status === "done"
-            ? "bg-yellow-400"
-            : "bg-gray-200"
+              ? "bg-yellow-400"
+              : "bg-gray-200"
         }`}
       >
         <img src={icon} alt={label} className="w-4 brightness-0 invert" />
       </div>
-      <span className="text-[10px] font-semibold text-gray-700">
-        {label}
-      </span>
+      <span className="text-[10px] font-semibold text-gray-700">{label}</span>
     </div>
   );
 }

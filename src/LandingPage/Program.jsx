@@ -1,13 +1,26 @@
-import React, { useRef, useState } from "react";
-import Playgroup from "../assets/Program/ProgramU.svg";
-import Kindergarten from "../assets/Program/ProgramUng.svg";
+import React, { useState, useEffect } from "react";
 import Pendidikan from "../assets/Pendaftarann/Toga.svg";
+import { api } from "../service/api";
 
 export default function Program() {
-  const playgroupRef = useRef(null);
-  const kindergartenRef = useRef(null);
-
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const phoneNumber = "6282220009850"; // GANTI nomor admin
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      const response = await api.getProducts();
+      setProducts(response.data || []);
+    } catch (error) {
+      console.error("Failed to fetch products:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const sendWhatsApp = (program) => {
     const message = `
@@ -19,12 +32,9 @@ Terima kasih 🙏
     `;
     window.open(
       `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`,
-      "_blank"
+      "_blank",
     );
   };
-
-  const scrollTo = (ref) =>
-    ref.current?.scrollIntoView({ behavior: "smooth" });
 
   const corePrograms = [
     "Aqidah & Morality Learning",
@@ -49,37 +59,20 @@ Terima kasih 🙏
   return (
     <section id="program" className="bg-[#FAFAFA] py-28">
       <div className="max-w-7xl mx-auto px-6">
-
         {/* ================= HEADER ================= */}
         <div className="max-w-2xl mb-20">
           <span className="inline-block text-sm font-semibold text-yellow-600 bg-yellow-100 px-4 py-1 rounded-full mb-4">
             Program Pendidikan
           </span>
           <h2 className="text-4xl font-bold text-gray-900 leading-snug">
-            Pendidikan Islami yang<br />Terstruktur & Berkarakter
+            Pendidikan Islami yang
+            <br />
+            Terstruktur & Berkarakter
           </h2>
           <p className="mt-4 text-gray-600">
             Kurikulum terpadu untuk membentuk anak sholeh, cerdas, dan mandiri
             sejak usia dini.
           </p>
-        </div>
-
-        {/* ================= JENJANG ================= */}
-        <div className="bg-white rounded-3xl p-8 shadow-sm mb-24">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-11 h-11 bg-yellow-100 rounded-xl flex items-center justify-center">
-              <img src={Pendidikan} className="w-5 h-5" />
-            </div>
-            <h3 className="text-2xl font-bold text-gray-900">
-              Jenjang Pendidikan
-            </h3>
-          </div>
-
-          <div className="flex sm:grid sm:grid-cols-3 gap-4 overflow-x-auto sm:overflow-visible pb-2">
-            <Jenjang title="Playgroup" age="3–4 Tahun" onClick={() => scrollTo(playgroupRef)} />
-            <Jenjang title="Kindergarten A" age="4–5 Tahun" onClick={() => scrollTo(kindergartenRef)} />
-            <Jenjang title="Kindergarten B" age="5–6 Tahun" onClick={() => scrollTo(kindergartenRef)} />
-          </div>
         </div>
 
         {/* ================= PROGRAM VALUE ================= */}
@@ -90,65 +83,41 @@ Terima kasih 🙏
         </div>
 
         {/* ================= PROGRAM CARDS ================= */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-14">
-          <ProgramCard
-            refProp={playgroupRef}
-            image={Playgroup}
-            title="Playgroup"
-            age="Usia 3–4 Tahun"
-            desc="Masa awal pembentukan karakter dan adab Islami melalui pendekatan bermain yang terarah."
-            onClick={() => sendWhatsApp("Playgroup")}
-          />
-          <ProgramCard
-            refProp={kindergartenRef}
-            image={Kindergarten}
-            title="Kindergarten (TK A & B)"
-            age="Usia 4–6 Tahun"
-            desc="Persiapan akademik dan spiritual menuju Sekolah Dasar dengan pendekatan Islami."
-            onClick={() => sendWhatsApp("Kindergarten")}
-          />
-        </div>
-
-      </div>
-
-      {/* ================= STICKY CTA MOBILE ================= */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t shadow-lg sm:hidden">
-        <div className="flex">
-          <button
-            onClick={() => scrollTo(playgroupRef)}
-            className="flex-1 py-4 text-sm font-semibold text-gray-700"
+        {loading ? (
+          <div className="flex items-center justify-center py-20">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-yellow-500"></div>
+          </div>
+        ) : products.length === 0 ? (
+          <div className="text-center py-20 text-gray-500">
+            <p className="text-lg">Belum ada program tersedia</p>
+          </div>
+        ) : (
+          <div
+            className={`grid grid-cols-1 gap-14 ${
+              products.length === 1
+                ? "lg:max-w-2xl lg:mx-auto"
+                : products.length === 2
+                  ? "lg:grid-cols-2"
+                  : "lg:grid-cols-3"
+            }`}
           >
-            Lihat Program
-          </button>
-          <button
-            onClick={() => sendWhatsApp("Pendaftaran")}
-            className="flex-1 py-4 text-sm font-semibold bg-yellow-500 text-white"
-          >
-            Konsultasi WA
-          </button>
-        </div>
+            {products.map((product) => (
+              <ProgramCard
+                key={product.id}
+                image={product.url}
+                title={product.product_name}
+                desc={product.description}
+                onClick={() => sendWhatsApp(product.product_name)}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
 }
 
 /* ================= SUB COMPONENTS ================= */
-
-const Jenjang = ({ title, age, onClick }) => (
-  <button
-    onClick={onClick}
-    className="
-      min-w-[220px] sm:min-w-0
-      p-5 text-left rounded-2xl
-      border border-gray-200
-      hover:border-yellow-500 hover:bg-yellow-50
-      transition
-    "
-  >
-    <p className="font-semibold text-gray-900">{title}</p>
-    <p className="text-sm text-gray-500 mt-1">{age}</p>
-  </button>
-);
 
 const ProgramBox = ({ title, items }) => {
   const [open, setOpen] = useState(false);
@@ -177,20 +146,43 @@ const ProgramBox = ({ title, items }) => {
   );
 };
 
-const ProgramCard = ({ refProp, image, title, age, desc, onClick }) => (
-  <div
-    ref={refProp}
-    className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition"
-  >
-    <div className="bg-[#FFF4E8] h-[260px] flex items-center justify-center">
-      <img src={image} className="max-h-full" />
+const ProgramCard = ({ image, title, desc, onClick }) => (
+  <div className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition">
+    <div
+      className="bg-[#FFF4E8] flex items-center justify-center overflow-hidden"
+      style={{ aspectRatio: "4/3" }}
+    >
+      {image ? (
+        <img
+          src={image}
+          alt={title}
+          className="w-full h-full object-cover"
+          onError={(e) => {
+            e.target.src = "https://via.placeholder.com/400x300?text=No+Image";
+          }}
+        />
+      ) : (
+        <div className="text-gray-400 text-center">
+          <svg
+            className="w-20 h-20 mx-auto mb-2"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path
+              fillRule="evenodd"
+              d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
+              clipRule="evenodd"
+            />
+          </svg>
+          <p className="text-sm">No Image</p>
+        </div>
+      )}
     </div>
     <div className="p-10">
-      <span className="text-xs bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full">
-        {age}
-      </span>
-      <h3 className="text-2xl font-bold mt-4 mb-3">{title}</h3>
-      <p className="text-gray-600 mb-6">{desc}</p>
+      <h3 className="text-2xl font-bold mb-3">{title}</h3>
+      <p className="text-gray-600 mb-6">
+        {desc || "Program pendidikan Islami berkualitas"}
+      </p>
       <button
         onClick={onClick}
         className="

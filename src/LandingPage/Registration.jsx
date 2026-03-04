@@ -33,7 +33,6 @@ export default function Registration() {
   return (
     <section id="pendaftaran" className="py-28 bg-white">
       <div className="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-20 items-center">
-
         {/* ================= LEFT CONTENT ================= */}
         <div>
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight mb-6">
@@ -42,8 +41,9 @@ export default function Registration() {
           </h2>
 
           <p className="text-gray-600 text-lg mb-10 max-w-xl leading-relaxed">
-            Orang tua dapat melakukan pendaftaran dan pembayaran biaya pendidikan
-            secara online melalui sistem yang aman, cepat, dan terintegrasi.
+            Orang tua dapat melakukan pendaftaran dan pembayaran biaya
+            pendidikan secara online melalui sistem yang aman, cepat, dan
+            terintegrasi.
           </p>
 
           {/* Steps */}
@@ -65,17 +65,14 @@ export default function Registration() {
 
         {/* ================= RIGHT FORM ================= */}
         <div className="bg-[#FFF7ED] rounded-3xl shadow-xl p-8 md:p-10">
-
           {/* Header */}
           <div className="flex items-center gap-3 mb-8">
-            <span className="text-2xl">📋</span>
             <h3 className="text-xl font-bold text-gray-900">
               Mulai Pendaftaran
             </h3>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-
             <Input
               label="Nama Lengkap Orang Tua"
               name="parentName"

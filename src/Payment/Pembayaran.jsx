@@ -1,49 +1,113 @@
-import React, { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useRegistrationStore } from "../store/registrationStore";
+import { api } from "../service/api";
 
-// ===== STEPPER ICONS =====
 import IsiDataStep from "../assets/Pendaftarann/isidata.svg";
 import PembayaranStep from "../assets/images/Payement/Wallet.svg";
 import SelesaiStep from "../assets/Pendaftarann/Selesai.svg";
 
-// ===== METODE ICONS =====
-import VirtualIcon from "../assets/Pembayarann/Virtual.svg";
-import KreditIcon from "../assets/Pembayarann/Kredit.svg";
-import QrisIcon from "../assets/Pembayarann/QR.svg";
-
 export default function Pembayaran() {
-  const { state } = useLocation();
   const navigate = useNavigate();
 
-  const total = 200000;
-  const [selectedMethod, setSelectedMethod] = useState(null);
-  const [loading, setLoading] = useState(false);
-  console.log("STATE PEMBAYARAN:", state);
+  // Get data dari Zustand
+  const { registrationData, registrationId, productInfo } =
+    useRegistrationStore();
 
+  const [productPrice, setProductPrice] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [loadingPrice, setLoadingPrice] = useState(true);
+  const [lastClickTime, setLastClickTime] = useState(0);
+
+  // Debug: Log Zustand data when component mounts
+  useEffect(() => {
+    console.log("=== PEMBAYARAN PAGE DEBUG ===");
+    console.log("registrationId:", registrationId);
+    console.log("registrationData:", registrationData);
+    console.log("productInfo:", productInfo);
+  }, []);
+
+  // Fetch product price from backend
+  useEffect(() => {
+    const fetchProductPrice = async () => {
+      if (!productInfo?.productId) {
+        alert(
+          "Data produk tidak ditemukan. Silakan isi form pendaftaran terlebih dahulu.",
+        );
+        navigate("/pendaftaran");
+        return;
+      }
+
+      try {
+        setLoadingPrice(true);
+        const result = await api.getProductById(productInfo.productId);
+
+        if (result.success && result.data) {
+          setProductPrice(result.data.set_price);
+        } else {
+          throw new Error("Failed to fetch product price");
+        }
+      } catch (error) {
+        console.error("Error fetching product price:", error);
+        alert("Gagal mengambil harga produk");
+      } finally {
+        setLoadingPrice(false);
+      }
+    };
+
+    fetchProductPrice();
+  }, [productInfo, navigate]);
 
   const handlePayment = async () => {
-    if (!window.snap) {
-      alert("Midtrans Snap belum siap");
+    // 🔒 Prevent multiple clicks
+    if (loading) {
+      console.log("Payment already in progress, ignoring click");
       return;
     }
 
-    // =============================
-    // 🔑 PAYLOAD UTAMA (FIXED)
-    // =============================
+    // 🔒 Debounce: Prevent rapid clicks (< 2 seconds)
+    const now = Date.now();
+    if (now - lastClickTime < 2000) {
+      console.log("Too fast! Please wait before clicking again.");
+      return;
+    }
+    setLastClickTime(now);
+
+    if (!window.snap) {
+      alert("Midtrans Snap belum siap. Pastikan script Midtrans sudah dimuat.");
+      return;
+    }
+
+    // Validasi data registrasi
+    if (!registrationId || !registrationData.parentName) {
+      console.error("Payment validation failed:");
+      console.error("registrationId:", registrationId);
+      console.error("registrationData:", registrationData);
+      alert(
+        "Data registrasi tidak lengkap. Silakan isi form pendaftaran terlebih dahulu.",
+      );
+      navigate("/pendaftaran");
+      return;
+    }
+
+    // Payload untuk payment
     const payload = {
-      parent_name: state?.parentName,
-      email: state?.email,
-      phone: state?.phone,          // ✅ FIX DI SINI
-      address: state?.address,
-      child_name: state?.childName,
-      level: state?.level,
-      total,
+      registration_id: registrationId,
+      parent_name: registrationData.parentName,
+      email: registrationData.email,
+      phone: registrationData.whatsapp, // ✅ FIX: phone dari whatsapp
+      address: registrationData.address,
+      child_name: registrationData.childName,
+      level: registrationData.level,
+      total: productPrice,
     };
 
-    // ❌ VALIDASI
+    // Validasi payload
     for (const key in payload) {
-      if (!payload[key]) {
-        alert(`Data ${key} kosong`);
+      if (!payload[key] && key !== "registration_id") {
+        console.error(`Validation failed: ${key} is empty`);
+        console.error("Full payload:", payload);
+        alert(`Data ${key} kosong. Silakan lengkapi form pendaftaran.`);
         return;
       }
     }
@@ -51,37 +115,109 @@ export default function Pembayaran() {
     try {
       setLoading(true);
 
-      // 1️⃣ REQUEST TOKEN MIDTRANS
-      const res = await fetch("https://khadijahbackendv2-production.up.railway.app/api/midtrans/token", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      // Request token Midtrans dari backend
+      const data = await api.createPaymentToken(payload);
+      console.log("Payment response:", data);
 
-      const data = await res.json();
-
-      if (!data.token) {
-        alert("Token Midtrans gagal dibuat");
+      if (!data.success) {
+        alert(data.message || "Token Midtrans gagal dibuat");
+        setLoading(false);
         return;
       }
 
-      // 2️⃣ TAMPILKAN SNAP
-      window.snap.pay(data.token, {
-        onSuccess: async () => {
-          await fetch("https://khadijahbackendv2-production.up.railway.app/api/payment/success", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-          });
+      if (!data.data?.token) {
+        console.error("No token in response:", data);
+        alert("Token tidak ditemukan dalam response");
+        setLoading(false);
+        return;
+      }
 
+      // Check if Midtrans Snap is loaded
+      if (!window.snap) {
+        alert("Midtrans Snap belum loaded. Silakan refresh halaman.");
+        setLoading(false);
+        return;
+      }
+
+      console.log("Opening Midtrans Snap with token:", data.data.token);
+
+      const invoiceId = data.data.invoice_id;
+
+      // Tampilkan Snap popup
+      window.snap.pay(data.data.token, {
+        onSuccess: async (result) => {
+          // ✅ Pembayaran BERHASIL - update status ke backend
+          console.log("Payment success:", result);
+
+          try {
+            // Update payment status di backend
+            await api.updatePaymentStatus({
+              invoice_id: invoiceId,
+              transaction_id: result.transaction_id,
+              transaction_status: result.transaction_status,
+              payment_type: result.payment_type,
+            });
+
+            console.log("Payment status updated in backend");
+          } catch (updateError) {
+            console.error("Failed to update payment status:", updateError);
+          }
+
+          setLoading(false);
           navigate("/pendaftaran/berhasil");
         },
-        onPending: (r) => console.log("PENDING:", r),
-        onError: (e) => console.error("ERROR:", e),
+        onPending: async (result) => {
+          // ⏳ Pembayaran PENDING (bank transfer, dll)
+          console.log("Payment pending:", result);
+
+          try {
+            // Update payment status ke pending
+            await api.updatePaymentStatus({
+              invoice_id: invoiceId,
+              transaction_id: result.transaction_id,
+              transaction_status: "pending",
+              payment_type: result.payment_type,
+            });
+          } catch (updateError) {
+            console.error("Failed to update payment status:", updateError);
+          }
+
+          setLoading(false);
+          alert(
+            "Pembayaran Anda sedang diproses. Silakan selesaikan pembayaran dan tunggu konfirmasi dari admin.",
+          );
+        },
+        onError: async (error) => {
+          // ❌ Pembayaran GAGAL
+          console.error("Payment error:", error);
+
+          try {
+            // Update payment status ke failed
+            await api.updatePaymentStatus({
+              invoice_id: invoiceId,
+              transaction_id: error.transaction_id || null,
+              transaction_status: "deny",
+              payment_type: error.payment_type || null,
+            });
+          } catch (updateError) {
+            console.error("Failed to update payment status:", updateError);
+          }
+
+          setLoading(false);
+          alert("Pembayaran gagal. Silakan coba lagi.");
+        },
+        onClose: () => {
+          // 🚫 User TUTUP popup tanpa bayar - jangan navigate
+          console.log("Payment popup ditutup oleh user");
+          setLoading(false);
+          // User tetap di halaman pembayaran, bisa coba lagi
+        },
       });
     } catch (err) {
-      console.error(err);
-      alert("Terjadi kesalahan pembayaran");
+      console.error("Payment error:", err);
+      alert(
+        "Terjadi kesalahan saat memproses pembayaran. Pastikan backend sudah berjalan.",
+      );
     } finally {
       setLoading(false);
     }
@@ -94,7 +230,11 @@ export default function Pembayaran() {
         <div className="max-w-md mx-auto flex items-center justify-between">
           <StepperTop icon={IsiDataStep} label="Isi Data" status="done" />
           <Divider active />
-          <StepperTop icon={PembayaranStep} label="Pembayaran" status="active" />
+          <StepperTop
+            icon={PembayaranStep}
+            label="Pembayaran"
+            status="active"
+          />
           <Divider />
           <StepperTop icon={SelesaiStep} label="Selesai" status="inactive" />
         </div>
@@ -110,49 +250,66 @@ export default function Pembayaran() {
             </div>
             <div className="text-right">
               <p className="text-xs">Total</p>
-              <p className="font-bold">
-                Rp {total.toLocaleString("id-ID")}
-              </p>
+              {loadingPrice ? (
+                <p className="font-bold text-sm">Loading...</p>
+              ) : (
+                <p className="font-bold">
+                  Rp {productPrice.toLocaleString("id-ID")}
+                </p>
+              )}
             </div>
           </div>
 
           <div className="p-5">
-            <div className="space-y-3">
-              <Method
-                icon={QrisIcon}
-                title="QRIS"
-                desc="Gopay, Dana, ShopeePay"
-                active={selectedMethod === "qris"}
-                onClick={() => setSelectedMethod("qris")}
-              />
-              <Method
-                icon={VirtualIcon}
-                title="Virtual Account"
-                desc="BCA, BNI, Mandiri"
-                active={selectedMethod === "va"}
-                onClick={() => setSelectedMethod("va")}
-              />
-              <Method
-                icon={KreditIcon}
-                title="Kartu Kredit"
-                desc="Visa, Mastercard"
-                active={selectedMethod === "cc"}
-                onClick={() => setSelectedMethod("cc")}
-              />
+            {/* Info Pendaftaran */}
+            <div className="mb-4 p-4 bg-gray-50 rounded-lg text-sm space-y-2">
+              <p className="text-gray-600">
+                <span className="font-semibold">Nama Anak:</span>{" "}
+                {registrationData.childName}
+              </p>
+              <p className="text-gray-600">
+                <span className="font-semibold">Jenjang:</span>{" "}
+                {registrationData.level}
+              </p>
+              <p className="text-gray-600">
+                <span className="font-semibold">Orang Tua:</span>{" "}
+                {registrationData.parentName}
+              </p>
+            </div>
+
+            {/* Payment Info */}
+            <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg text-sm">
+              <p className="text-blue-800 mb-2">
+                <strong>ℹ️ Metode Pembayaran</strong>
+              </p>
+              <p className="text-blue-700 text-xs leading-relaxed">
+                Anda dapat memilih metode pembayaran setelah klik tombol di
+                bawah:
+              </p>
+              <ul className="mt-2 text-xs text-blue-600 space-y-1">
+                <li>• QRIS (GoPay, DANA, ShopeePay)</li>
+                <li>• Virtual Account (BCA, BNI, Mandiri)</li>
+                <li>• Kartu Kredit/Debit</li>
+                <li>• E-Wallet lainnya</li>
+              </ul>
             </div>
 
             <button
-              disabled={!selectedMethod || loading}
+              disabled={loading || loadingPrice}
               onClick={handlePayment}
-              className={`mt-6 w-full py-4 rounded-xl font-semibold text-sm
+              className={`w-full py-4 rounded-xl font-semibold text-sm transition-all
                 ${
-                  selectedMethod
-                    ? "bg-yellow-500 hover:bg-yellow-600 text-white"
-                    : "bg-gray-200 text-gray-400"
+                  loading || loadingPrice
+                    ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                    : "bg-yellow-500 hover:bg-yellow-600 text-white shadow-lg hover:shadow-xl active:scale-[0.98]"
                 }`}
             >
               {loading ? "Memproses..." : "Bayar Sekarang"}
             </button>
+
+            <p className="text-center text-xs text-gray-500 mt-4">
+              Transaksi dijamin aman dengan enkripsi SSL
+            </p>
           </div>
         </div>
       </div>
@@ -184,24 +341,5 @@ function Divider({ active }) {
         active ? "bg-yellow-400" : "bg-gray-300"
       }`}
     />
-  );
-}
-
-function Method({ icon, title, desc, active, onClick }) {
-  return (
-    <div
-      onClick={onClick}
-      className={`flex items-center gap-3 border rounded-xl px-4 py-3 cursor-pointer
-        ${active ? "border-yellow-500 bg-yellow-50" : "hover:bg-gray-50"}`}
-    >
-      <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
-        <img src={icon} alt={title} className="w-5" />
-      </div>
-      <div className="flex-1">
-        <p className="text-sm font-semibold">{title}</p>
-        <p className="text-xs text-gray-500">{desc}</p>
-      </div>
-      {active && <span className="text-yellow-500 font-bold">✓</span>}
-    </div>
   );
 }
