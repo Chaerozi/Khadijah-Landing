@@ -1,34 +1,11 @@
-FROM node:20 AS build
-
-# Build arguments for environment variables
-ARG VITE_API_URL
-ENV VITE_API_URL=$VITE_API_URL
-
-WORKDIR /app
-
-# Copy package files
-COPY package*.json ./
-
-# Clean install with fresh esbuild binary for linux
-RUN npm ci && npm cache clean --force
-
-# Copy source code
-COPY . .
-
-# Set environment to avoid esbuild issues
-ENV ESBUILD_BINARY_PATH=/app/node_modules/esbuild/bin/esbuild
-
-# Build the application
-RUN npm run build
-
 # Production stage - serve with nginx
 FROM nginx:alpine
 
 # Copy custom nginx config
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Copy built files from build stage
-COPY --from=build /app/dist /usr/share/nginx/html
+# Copy pre-built dist folder from local build
+COPY dist /usr/share/nginx/html
 
 # Expose port
 EXPOSE 80
