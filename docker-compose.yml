@@ -3,9 +3,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      platform: linux/amd64
       args:
         VITE_API_URL: ${VITE_API_URL}
     container_name: khadijah-user-frontend
+    platform: linux/amd64
     restart: always
     ports:
       - "8081:80"

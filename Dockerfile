@@ -12,6 +12,9 @@ COPY package*.json ./
 # Install dependencies (need devDependencies for Vite build)
 RUN npm ci
 
+# Force rebuild esbuild for correct platform
+RUN npm rebuild esbuild
+
 # Copy source code
 COPY . .
 
