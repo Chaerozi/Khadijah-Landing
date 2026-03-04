@@ -1,4 +1,4 @@
-FROM node:20-alpine AS build
+FROM node:20 AS build
 
 # Build arguments for environment variables
 ARG VITE_API_URL
@@ -9,14 +9,14 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies (need devDependencies for Vite build)
-RUN npm ci
-
-# Force rebuild esbuild for correct platform
-RUN npm rebuild esbuild
+# Clean install with fresh esbuild binary for linux
+RUN npm ci && npm cache clean --force
 
 # Copy source code
 COPY . .
+
+# Set environment to avoid esbuild issues
+ENV ESBUILD_BINARY_PATH=/app/node_modules/esbuild/bin/esbuild
 
 # Build the application
 RUN npm run build
