@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useRegistrationStore } from "../store/registrationStore";
 import { api } from "../service/api";
@@ -114,61 +114,48 @@ export default function Pendaftaran1() {
     }
   }, [location.state]);
 
-  // ===== HANDLE CHANGE + VALIDASI =====
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     let newErrors = { ...errors };
 
-    // ================= WhatsApp =================
     if (name === "whatsapp") {
       const regex = /^[0-9]{10,15}$/;
-      if (!regex.test(value)) {
-        newErrors.whatsapp = "Nomor WhatsApp tidak valid";
-      } else {
-        delete newErrors.whatsapp;
-      }
+      if (!regex.test(value)) newErrors.whatsapp = "Nomor WhatsApp tidak valid";
+      else delete newErrors.whatsapp;
     }
 
-    // ================= Email =================
     if (name === "email") {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(value)) {
-        newErrors.email = "Format email tidak valid";
-      } else {
-        delete newErrors.email;
-      }
+      if (!emailRegex.test(value)) newErrors.email = "Format email tidak valid";
+      else delete newErrors.email;
     }
 
-    // ================= FILE KK =================
-    if (name === "kkFile" && files?.length) {
+    if ((name === "kkFile" || name === "aktaFile") && files?.length) {
       const file = files[0];
       const allowedTypes = ["image/jpeg", "image/png", "application/pdf"];
       const maxSize = 2 * 1024 * 1024; // 2MB
 
-      // ❌ format salah
       if (!allowedTypes.includes(file.type)) {
-        newErrors.kkFile = "File harus JPG, PNG, atau PDF";
+        newErrors[name] = "File harus JPG, PNG, atau PDF";
         setErrors(newErrors);
-        setFormData({ ...formData, kkFile: null });
-        setKkPreview(null);
         return;
       }
 
-      // ❌ ukuran terlalu besar
       if (file.size > maxSize) {
-        newErrors.kkFile = "Ukuran file maksimal 2MB";
+        newErrors[name] = "Ukuran file maksimal 2MB";
         setErrors(newErrors);
-        setFormData({ ...formData, kkFile: null });
-        setKkPreview(null);
         return;
       }
 
-      // ✅ valid → simpan preview
-      delete newErrors.kkFile;
-      setKkPreview({
+      delete newErrors[name];
+
+      const preview = {
         url: URL.createObjectURL(file),
         type: file.type,
-      });
+      };
+
+      if (name === "kkFile") setKkPreview(preview);
+      if (name === "aktaFile") setAktaPreview(preview);
     }
 
     // ================= FILE AKTE KELAHIRAN =================
@@ -300,15 +287,17 @@ export default function Pendaftaran1() {
         "Terjadi kesalahan saat mengirim data. Pastikan server backend sudah berjalan.",
       );
     }
+
+    navigate("/pendaftaran/pembayaran", { state: formData });
   };
 
   return (
-    <section className="min-h-screen bg-gradient-to-br from-orange-50 via-yellow-50 to-white py-12">
-      <div className="max-w-5xl mx-auto px-6">
+    <section className="min-h-screen bg-gradient-to-b from-yellow-50 to-white py-12 px-4">
+      <div className="max-w-5xl mx-auto">
         {/* HEADER */}
         <div className="text-center mb-14">
-          <h1 className="text-4xl font-bold text-gray-900 mt-16">
-            Formulir Pendaftaran Siswa Baru
+          <h1 className="mt-18 text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
+            Formulir Pendaftaran
           </h1>
           {academicYear && (
             <p className="text-lg font-semibold text-[#FF8225] mt-2">
@@ -516,26 +505,18 @@ export default function Pendaftaran1() {
   );
 }
 
-/* ===== COMPONENTS ===== */
+/* ===== SMALL COMPONENTS ===== */
+
 function Step({ icon, label, active }) {
   return (
-    <div className="flex flex-col items-center text-sm">
+    <div className="flex flex-col items-center">
       <div
-        className={`w-12 h-12 rounded-full flex items-center justify-center ${
-          active ? "bg-yellow-500" : "bg-gray-200"
-        }`}
+        className={`w-10 h-10 rounded-full flex items-center justify-center ${active ? "bg-yellow-500" : "bg-gray-200"}`}
       >
-        <img
-          src={icon}
-          alt={label}
-          className={`w-6 ${active ? "invert" : "opacity-60"}`}
-        />
+        <img src={icon} className={`w-5 ${active ? "invert" : "opacity-60"}`} />
       </div>
-
       <span
-        className={`mt-2 font-semibold ${
-          active ? "text-yellow-600" : "text-gray-400"
-        }`}
+        className={`mt-2 text-xs font-semibold ${active ? "text-yellow-600" : "text-gray-400"}`}
       >
         {label}
       </span>
@@ -544,10 +525,10 @@ function Step({ icon, label, active }) {
 }
 
 function Line() {
-  return <div className="w-16 h-[2px] bg-orange-200" />;
+  return <div className="w-10 h-[2px] bg-yellow-200" />;
 }
 
-function Input({ icon, label, helper, error, ...props }) {
+function Input({ icon, label, error, ...props }) {
   return (
     <div>
       <label className="block text-sm font-semibold mb-2">{label}</label>
@@ -562,7 +543,6 @@ function Input({ icon, label, helper, error, ...props }) {
           ${error ? "border-red-400" : "border-gray-300"} outline-none`}
         />
       </div>
-      {helper && <p className="text-xs text-gray-500 mt-1">{helper}</p>}
       {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
     </div>
   );
@@ -693,7 +673,25 @@ function Select({
   );
 }
 
-function Upload({ icon, label, error, ...props }) {
+function Upload({
+  icon,
+  label,
+  name,
+  error,
+  onChange,
+  accept,
+  preview,
+  setPreview,
+  setFormData,
+}) {
+  const fileRef = useRef(null);
+
+  const handleRemove = () => {
+    setPreview(null);
+    setFormData((prev) => ({ ...prev, [name]: null }));
+    if (fileRef.current) fileRef.current.value = "";
+  };
+
   return (
     <div>
       <label className="block text-sm font-semibold mb-2">{label}</label>

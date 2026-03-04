@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 
 import Navbar from "./Navbar/Navbar";
 import Hero from "./LandingPage/Hero";
+import Akreditasi from "./LandingPage/Akreditasi";
 import WhyChooseUs from "./LandingPage/WhyChooseUs";
 import Program from "./LandingPage/Program";
 import Registration from "./LandingPage/Registration";
@@ -17,6 +18,7 @@ function Home() {
   return (
     <>
       <Hero />
+      <Akreditasi/>
       <WhyChooseUs />
       <Program />
       <Registration />

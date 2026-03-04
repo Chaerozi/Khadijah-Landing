@@ -20,7 +20,6 @@ export default function Registration() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    //  KIRIM DATA KE FORMULIR PENDAFTARAN SISWA
     navigate("/pendaftaran", {
       state: {
         parentName: formData.parentName,
@@ -34,9 +33,16 @@ export default function Registration() {
     <section id="pendaftaran" className="py-28 bg-white">
       <div className="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-20 items-center">
         {/* ================= LEFT CONTENT ================= */}
-        <div>
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight mb-6">
-            Pendaftaran Online <br />
+        <div className="text-center lg:text-left">
+          <h2
+            className="
+            text-2xl sm:text-3xl lg:text-4xl xl:text-5xl
+            font-bold text-gray-900
+            leading-tight mb-5
+          "
+          >
+            Pendaftaran Online
+            <br />
             Mudah & Cepat
           </h2>
 
@@ -47,17 +53,27 @@ export default function Registration() {
           </p>
 
           {/* Steps */}
-          <div className="space-y-6">
+          <div className="space-y-5 max-w-md mx-auto lg:mx-0">
             {[
               "Isi formulir pendaftaran digital",
               "Bayar biaya registrasi via Midtrans",
               "Konfirmasi otomatis & verifikasi data",
             ].map((text, i) => (
-              <div key={i} className="flex items-start gap-4">
-                <div className="w-9 h-9 rounded-full bg-yellow-500 text-white flex items-center justify-center font-bold">
+              <div key={i} className="flex items-start gap-4 text-left">
+                <div
+                  className="
+                  w-8 h-8
+                  rounded-full
+                  bg-yellow-500
+                  text-white
+                  flex items-center justify-center
+                  font-semibold text-sm
+                  shrink-0
+                "
+                >
                   {i + 1}
                 </div>
-                <p className="text-gray-700 text-base">{text}</p>
+                <p className="text-gray-700 text-sm sm:text-base">{text}</p>
               </div>
             ))}
           </div>
@@ -99,14 +115,23 @@ export default function Registration() {
 
             <button
               type="submit"
-              className="w-full mt-2 bg-yellow-500 hover:bg-yellow-600
-                         active:scale-[0.98] transition-all
-                         text-white font-semibold py-3 rounded-xl shadow-md"
+              className="
+                w-full
+                bg-yellow-500 hover:bg-yellow-600
+                active:scale-[0.98]
+                transition-all
+                text-white
+                font-semibold
+                py-3
+                rounded-xl
+                shadow-md
+                text-sm sm:text-base
+              "
             >
               Daftar & Lanjut Pembayaran
             </button>
 
-            <p className="text-xs text-center text-gray-500 mt-4">
+            <p className="text-xs text-center text-gray-500 mt-3">
               Dengan mendaftar, Anda menyetujui kebijakan privasi kami
             </p>
           </form>
@@ -116,19 +141,34 @@ export default function Registration() {
   );
 }
 
-/* ================= INPUT COMPONENT ================= */
-
 function Input({ label, ...props }) {
   return (
     <div>
-      <label className="block text-sm font-semibold text-gray-700 mb-2">
+      <label
+        className="
+        block
+        text-xs sm:text-sm
+        font-semibold
+        text-gray-700
+        mb-2
+      "
+      >
         {label}
       </label>
+
       <input
         {...props}
         required
-        className="w-full px-4 py-3 rounded-lg border border-gray-300
-                   focus:ring-2 focus:ring-yellow-400 outline-none bg-white"
+        className="
+          w-full
+          px-4 py-3
+          rounded-lg
+          border border-gray-300
+          focus:ring-2 focus:ring-yellow-400
+          outline-none
+          bg-white
+          text-sm sm:text-base
+        "
       />
     </div>
   );

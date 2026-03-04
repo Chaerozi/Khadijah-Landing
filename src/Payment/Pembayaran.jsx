@@ -224,10 +224,10 @@ export default function Pembayaran() {
   };
 
   return (
-    <section className="min-h-screen bg-[#FFF9F1] px-4">
+    <section className="min-h-screen bg-gradient-to-b from-yellow-50 to-white px-4 py-10">
       {/* ===== STEPPER ===== */}
-      <div className="pt-16 pb-10">
-        <div className="max-w-md mx-auto flex items-center justify-between">
+      <div className="mt-28 max-w-md mx-auto mb-10">
+        <div className="flex items-center justify-between">
           <StepperTop icon={IsiDataStep} label="Isi Data" status="done" />
           <Divider active />
           <StepperTop
@@ -294,6 +294,7 @@ export default function Pembayaran() {
               </ul>
             </div>
 
+            {/* BUTTON */}
             <button
               disabled={loading || loadingPrice}
               onClick={handlePayment}
@@ -321,7 +322,7 @@ export default function Pembayaran() {
 
 function StepperTop({ icon, label, status }) {
   return (
-    <div className="flex flex-col items-center gap-1">
+    <div className="flex flex-col items-center gap-1 text-[10px]">
       <div
         className={`w-10 h-10 rounded-full flex items-center justify-center ${
           status === "inactive" ? "bg-gray-200" : "bg-yellow-500"
@@ -329,7 +330,17 @@ function StepperTop({ icon, label, status }) {
       >
         <img src={icon} alt={label} className="w-4 brightness-0 invert" />
       </div>
-      <span className="text-[10px] font-semibold">{label}</span>
+      <span
+        className={`font-semibold ${
+          status === "active"
+            ? "text-yellow-600"
+            : status === "done"
+              ? "text-gray-600"
+              : "text-gray-400"
+        }`}
+      >
+        {label}
+      </span>
     </div>
   );
 }

@@ -24,12 +24,16 @@ export default function Program() {
 
   const sendWhatsApp = (program) => {
     const message = `
-Halo Admin Khadijah Islamic Preschool 👋
-Saya ingin berkonsultasi mengenai program:
+Assalamu’alaikum Warahmatullahi Wabarakatuh 😊
+
+Perkenalkan, saya ingin berkonsultasi mengenai program:
 📘 ${program}
 
-Terima kasih 🙏
-    `;
+Mohon informasi lebih lanjut.
+
+Wassalamu’alaikum Warahmatullahi Wabarakatuh
+`;
+
     window.open(
       `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`,
       "_blank",
@@ -49,7 +53,8 @@ Terima kasih 🙏
   const additionalPrograms = [
     "Reading & Writing",
     "Market Day",
-    "Parenting & Teaching Day",
+    "Parenting",
+    "Parent Teaching Day",
     "Outdoor Learning",
     "Practical Life Skill",
   ];
@@ -60,8 +65,8 @@ Terima kasih 🙏
     <section id="program" className="bg-[#FAFAFA] py-28">
       <div className="max-w-7xl mx-auto px-6">
         {/* ================= HEADER ================= */}
-        <div className="max-w-2xl mb-20">
-          <span className="inline-block text-sm font-semibold text-yellow-600 bg-yellow-100 px-4 py-1 rounded-full mb-4">
+        <div className="max-w-xl mb-12 sm:mb-16">
+          <span className="inline-block text-xs sm:text-sm font-semibold text-yellow-600 bg-yellow-100 px-4 py-1 rounded-full mb-4">
             Program Pendidikan
           </span>
           <h2 className="text-4xl font-bold text-gray-900 leading-snug">
@@ -69,14 +74,15 @@ Terima kasih 🙏
             <br />
             Terstruktur & Berkarakter
           </h2>
-          <p className="mt-4 text-gray-600">
+
+          <p className="mt-4 text-sm sm:text-base text-gray-600">
             Kurikulum terpadu untuk membentuk anak sholeh, cerdas, dan mandiri
             sejak usia dini.
           </p>
         </div>
 
         {/* ================= PROGRAM VALUE ================= */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-28">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-16 sm:mb-24">
           <ProgramBox title="Program Inti" items={corePrograms} />
           <ProgramBox title="Program Tambahan" items={additionalPrograms} />
           <ProgramBox title="Ekstrakurikuler" items={extracurriculars} />
@@ -123,25 +129,25 @@ const ProgramBox = ({ title, items }) => {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm">
+    <div className="bg-white rounded-2xl p-5 sm:p-6 shadow-sm">
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex justify-between items-center font-bold text-lg"
+        className="w-full flex justify-between items-center font-bold text-base sm:text-lg"
       >
         {title}
-        <span className="text-xl">{open ? "−" : "+"}</span>
+        <span>{open ? "−" : "+"}</span>
       </button>
 
-      {(open || window.innerWidth >= 768) && (
-        <ul className="mt-4 space-y-2 text-sm text-gray-600">
-          {items.map((item, i) => (
-            <li key={i} className="flex gap-2">
-              <span className="text-yellow-500">✔</span>
-              {item}
-            </li>
-          ))}
-        </ul>
-      )}
+      <ul
+        className={`mt-4 space-y-2 text-sm text-gray-600 ${open ? "block" : "hidden md:block"}`}
+      >
+        {items.map((item, i) => (
+          <li key={i} className="flex gap-2">
+            <span className="text-yellow-500">✔</span>
+            {item}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };
@@ -189,7 +195,7 @@ const ProgramCard = ({ image, title, desc, onClick }) => (
           w-full sm:w-auto
           bg-yellow-500 text-white
           py-3 px-6 rounded-xl
-          font-semibold
+          font-semibold text-sm sm:text-base
           hover:bg-yellow-600 transition
         "
       >
