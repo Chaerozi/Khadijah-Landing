@@ -17,6 +17,12 @@ export const api = {
         },
       });
 
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        const text = await response.text();
+        throw new Error(`Server error (${response.status}): ${text.substring(0, 200)}`);
+      }
+
       const data = await response.json();
 
       if (!response.ok) {
@@ -47,6 +53,13 @@ export const api = {
       }
 
       const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        const text = await response.text();
+        throw new Error(`Server error (${response.status}): ${text.substring(0, 200)}`);
+      }
+
       const data = await response.json();
 
       if (!response.ok) {

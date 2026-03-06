@@ -215,9 +215,7 @@ export default function Pembayaran() {
       });
     } catch (err) {
       console.error("Payment error:", err);
-      alert(
-        "Terjadi kesalahan saat memproses pembayaran. Pastikan backend sudah berjalan.",
-      );
+      alert(err.message || "Terjadi kesalahan saat memproses pembayaran.");
     } finally {
       setLoading(false);
     }
