@@ -9,7 +9,14 @@ import SelesaiStep from "../assets/Pendaftarann/Selesai.svg";
 
 export default function Berhasil() {
   const navigate = useNavigate();
-  const { clearRegistration } = useRegistrationStore();
+  const { clearRegistration, registrationId } = useRegistrationStore();
+
+  // Guard: redirect to root if accessed directly without going through payment
+  useEffect(() => {
+    if (!registrationId) {
+      navigate("/", { replace: true });
+    }
+  }, [registrationId, navigate]);
 
   // ⏱️ Auto redirect ke Beranda + Clear Zustand
   useEffect(() => {

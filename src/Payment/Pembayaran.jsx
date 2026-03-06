@@ -145,21 +145,23 @@ export default function Pembayaran() {
 
       const invoiceId = data.data.invoice_id;
 
+      // Track if payment was completed (success/pending) to handle onClose correctly
+      let paymentCompleted = false;
+
       // Tampilkan Snap popup
       window.snap.pay(data.data.token, {
         onSuccess: async (result) => {
           // ✅ Pembayaran BERHASIL - update status ke backend
           console.log("Payment success:", result);
+          paymentCompleted = true;
 
           try {
-            // Update payment status di backend
             await api.updatePaymentStatus({
               invoice_id: invoiceId,
               transaction_id: result.transaction_id,
               transaction_status: result.transaction_status,
               payment_type: result.payment_type,
             });
-
             console.log("Payment status updated in backend");
           } catch (updateError) {
             console.error("Failed to update payment status:", updateError);
@@ -171,6 +173,7 @@ export default function Pembayaran() {
         onPending: async (result) => {
           // ⏳ Pembayaran PENDING (bank transfer, dll)
           console.log("Payment pending:", result);
+          paymentCompleted = true;
 
           try {
             // Update payment status ke pending
@@ -209,10 +212,15 @@ export default function Pembayaran() {
           alert("Pembayaran gagal. Silakan coba lagi.");
         },
         onClose: () => {
-          // 🚫 User TUTUP popup tanpa bayar - jangan navigate
+          // If payment was completed but onSuccess/onPending didn't navigate
+          // (can happen in sandbox when popup closes before callback fires)
+          if (paymentCompleted) {
+            navigate("/pendaftaran/berhasil");
+            return;
+          }
+          // User closed popup without paying — stay on payment page
           console.log("Payment popup ditutup oleh user");
           setLoading(false);
-          // User tetap di halaman pembayaran, bisa coba lagi
         },
       });
     } catch (err) {
