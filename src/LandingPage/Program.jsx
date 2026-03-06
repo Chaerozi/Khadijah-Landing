@@ -5,7 +5,7 @@ import { api } from "../service/api";
 export default function Program() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const phoneNumber = "6282220009850"; // GANTI nomor admin
+  const phoneNumber = "6282220009850";
 
   useEffect(() => {
     fetchProducts();

@@ -130,7 +130,7 @@ export default function Pendaftaran1() {
       else delete newErrors.email;
     }
 
-    if ((name === "kkFile" || name === "aktaFile") && files?.length) {
+    if (name === "kkFile" && files?.length) {
       const file = files[0];
       const allowedTypes = ["image/jpeg", "image/png", "application/pdf"];
       const maxSize = 2 * 1024 * 1024; // 2MB
@@ -154,8 +154,7 @@ export default function Pendaftaran1() {
         type: file.type,
       };
 
-      if (name === "kkFile") setKkPreview(preview);
-      if (name === "aktaFile") setAktaPreview(preview);
+      setKkPreview(preview);
     }
 
     // ================= FILE AKTE KELAHIRAN =================
@@ -283,12 +282,8 @@ export default function Pendaftaran1() {
       navigate("/pendaftaran/pembayaran");
     } catch (err) {
       console.error("Submission error:", err);
-      alert(
-        "Terjadi kesalahan saat mengirim data. Pastikan server backend sudah berjalan.",
-      );
+      alert(err.message || "Terjadi kesalahan saat mengirim data. Pastikan server backend sudah berjalan.");
     }
-
-    navigate("/pendaftaran/pembayaran", { state: formData });
   };
 
   return (
@@ -680,17 +675,8 @@ function Upload({
   error,
   onChange,
   accept,
-  preview,
-  setPreview,
-  setFormData,
 }) {
   const fileRef = useRef(null);
-
-  const handleRemove = () => {
-    setPreview(null);
-    setFormData((prev) => ({ ...prev, [name]: null }));
-    if (fileRef.current) fileRef.current.value = "";
-  };
 
   return (
     <div>
@@ -702,7 +688,10 @@ function Upload({
         />
         <input
           type="file"
-          {...props}
+          ref={fileRef}
+          name={name}
+          onChange={onChange}
+          accept={accept}
           className="w-full pl-12 py-3 border rounded-lg"
         />
       </div>
