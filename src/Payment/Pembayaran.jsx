@@ -120,7 +120,9 @@ export default function Pembayaran() {
       console.log("Payment response:", data);
 
       if (!data.success) {
-        alert(data.message || "Token Midtrans gagal dibuat");
+        // Show real Midtrans error if available
+        const errorDetail = data.errors?.error ? `\n\nDetail: ${data.errors.error}` : "";
+        alert((data.message || "Token Midtrans gagal dibuat") + errorDetail);
         setLoading(false);
         return;
       }
