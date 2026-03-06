@@ -211,14 +211,26 @@ export default function Pembayaran() {
           setLoading(false);
           alert("Pembayaran gagal. Silakan coba lagi.");
         },
-        onClose: () => {
-          // If payment was completed but onSuccess/onPending didn't navigate
-          // (can happen in sandbox when popup closes before callback fires)
+        onClose: async () => {
+          // If payment was already confirmed by onSuccess/onPending callback, navigate immediately
           if (paymentCompleted) {
             navigate("/pendaftaran/berhasil");
             return;
           }
-          // User closed popup without paying — stay on payment page
+
+          // Fallback: verify with backend in case Midtrans closed without firing onSuccess
+          // (can happen on production with certain payment methods)
+          try {
+            const statusResult = await api.getPaymentStatus(registrationId);
+            if (statusResult?.data?.state === "success" || statusResult?.data?.state === "pending") {
+              navigate("/pendaftaran/berhasil");
+              return;
+            }
+          } catch (e) {
+            // Ignore status check errors — user stays on payment page
+          }
+
+          // User closed popup without paying
           console.log("Payment popup ditutup oleh user");
           setLoading(false);
         },

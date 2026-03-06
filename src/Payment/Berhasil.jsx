@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRegistrationStore } from "../store/registrationStore";
 
@@ -11,12 +11,26 @@ export default function Berhasil() {
   const navigate = useNavigate();
   const { clearRegistration, registrationId } = useRegistrationStore();
 
+  // Wait for Zustand to rehydrate from localStorage before running the guard.
+  // On full-page reloads (e.g. Midtrans redirect), the store starts with null
+  // and rehydrates asynchronously — without this the guard would wrongly redirect.
+  const [hydrated, setHydrated] = useState(
+    () => useRegistrationStore.persist.hasHydrated()
+  );
+
+  useEffect(() => {
+    if (hydrated) return;
+    const unsub = useRegistrationStore.persist.onFinishHydration(() => setHydrated(true));
+    return unsub;
+  }, [hydrated]);
+
   // Guard: redirect to root if accessed directly without going through payment
   useEffect(() => {
+    if (!hydrated) return;
     if (!registrationId) {
       navigate("/", { replace: true });
     }
-  }, [registrationId, navigate]);
+  }, [hydrated, registrationId, navigate]);
 
   // ⏱️ Auto redirect ke Beranda + Clear Zustand
   useEffect(() => {

@@ -116,4 +116,12 @@ export const api = {
   updatePaymentStatus: async (statusData) => {
     return api.post("/payments/update-status", statusData);
   },
+
+  /**
+   * Check payment status by registration ID
+   * Used after Snap popup closes to verify payment went through
+   */
+  getPaymentStatus: async (registrationId) => {
+    return api.get(`/payments/status/${registrationId}`);
+  },
 };
