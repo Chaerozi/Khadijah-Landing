@@ -150,25 +150,22 @@ export default function Pembayaran() {
 
       // Tampilkan Snap popup
       window.snap.pay(data.data.token, {
-        onSuccess: async (result) => {
-          // ✅ Pembayaran BERHASIL - update status ke backend
+        onSuccess: (result) => {
+          // ✅ Pembayaran BERHASIL
           console.log("Payment success:", result);
           paymentCompleted = true;
 
-          try {
-            await api.updatePaymentStatus({
-              invoice_id: invoiceId,
-              transaction_id: result.transaction_id,
-              transaction_status: result.transaction_status,
-              payment_type: result.payment_type,
-            });
-            console.log("Payment status updated in backend");
-          } catch (updateError) {
-            console.error("Failed to update payment status:", updateError);
-          }
-
+          // Navigate immediately — don't block on backend update
           setLoading(false);
           navigate("/pendaftaran/berhasil");
+
+          // Fire backend update in background (webhook will already handle this on production)
+          api.updatePaymentStatus({
+            invoice_id: invoiceId,
+            transaction_id: result.transaction_id,
+            transaction_status: result.transaction_status,
+            payment_type: result.payment_type,
+          }).catch((err) => console.error("Background status update failed:", err));
         },
         onPending: async (result) => {
           // ⏳ Pembayaran PENDING (bank transfer, dll)
